@@ -5,8 +5,8 @@
 **Selected Topic:** Hotel Reservation System
 **Stack:** PHP 8.x (no framework), MySQL 8 / MariaDB, HTML5, CSS3, Vanilla JavaScript (ES6)
 **Environment:** XAMPP (Apache + MySQL + PHP)
-**Project root:** `C:\xampp\htdocs\Hotel Reservation System`
-**Local URL:** `http://localhost/Hotel%20Reservation%20System/`
+**Project root:** `C:\xampp\htdocs\serandib_grand`
+**Local URL:** `http://localhost/serandib_grand/`
 
 > This document is the single source of truth for the whole group. **Read this fully before writing any code.**
 > Nobody writes a line of code until the folder structure, database schema, and CSS design tokens in this document exist in the repository.
@@ -1624,8 +1624,8 @@ RedirectMatch 403 ^/(config|src|storage|database|docs)/.*$
 Options -Indexes
 
 # ── Friendly error pages ────────────────────────────────────────
-ErrorDocument 403 /Hotel%20Reservation%20System/403.php
-ErrorDocument 404 /Hotel%20Reservation%20System/404.php
+ErrorDocument 403 /serandib_grand/403.php
+ErrorDocument 404 /serandib_grand/404.php
 ```
 
 > If CSP with `script-src 'self'` blocks a CDN chart library, that is a signal to self-host the library in `assets/js/vendor/` rather than to weaken the policy.
@@ -2425,7 +2425,7 @@ copy config\config.sample.php config\config.php
 #    uploads/rooms/ and storage/logs/ must be writable by Apache
 
 # 7. Open the app
-#    http://localhost/Hotel%20Reservation%20System/
+#    http://localhost/serandib_grand/
 ```
 
 ### 15.3 `config/config.sample.php`
@@ -2437,7 +2437,7 @@ declare(strict_types=1);
 // ── Environment ──────────────────────────────────────────────
 define('APP_ENV',  'development');   // 'development' | 'production'
 define('APP_NAME', 'Serendib Grand Hotel');
-define('BASE_URL', 'http://localhost/Hotel%20Reservation%20System');
+define('BASE_URL', 'http://localhost/serandib_grand');
 
 // ── Paths ────────────────────────────────────────────────────
 define('BASE_PATH',    dirname(__DIR__));

@@ -91,7 +91,7 @@ Also added: occupancy must fit the room type's declared capacity, max 30 nights,
 RedirectMatch 403 ^/(config|src|storage|database|docs)/.*$
 ```
 
-`RedirectMatch` matches the **full URL path**. The app is served from `/Hotel%20Reservation%20System/`, so the pattern never matched anything and every "protected" directory was reachable.
+`RedirectMatch` matches the **full URL path**. The app is served from `/serandib_grand/`, so the pattern never matched anything and every "protected" directory was reachable.
 
 **Impact:** `config/database.php`, `src/Core/Database.php` and the whole application internals were fetchable. The saving grace was that those files only `define()` or `return` and emit no output — but the control that was supposed to stop this did nothing, and one `echo` or a parse error would have exposed credentials.
 

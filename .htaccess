@@ -25,7 +25,7 @@
 #
 #  The previous `RedirectMatch 403 ^/(config|src|...)/` rule was BROKEN:
 #  RedirectMatch compares against the full URL path, which here begins with
-#  /Hotel%20Reservation%20System/, so the pattern never matched and none of
+#  /serandib_grand/, so the pattern never matched and none of
 #  the internal directories were actually protected. Directory protection is
 #  now done by a dedicated .htaccess inside each protected folder, which
 #  works no matter what the project folder is called.
@@ -50,6 +50,6 @@ RedirectMatch 404 /\.vscode
 RedirectMatch 404 /\.idea
 
 # ── Friendly error pages ────────────────────────────────────────
-ErrorDocument 403 /Hotel%20Reservation%20System/403.php
-ErrorDocument 404 /Hotel%20Reservation%20System/404.php
-ErrorDocument 500 /Hotel%20Reservation%20System/500.php
+ErrorDocument 403 /serandib_grand/403.php
+ErrorDocument 404 /serandib_grand/404.php
+ErrorDocument 500 /serandib_grand/500.php
