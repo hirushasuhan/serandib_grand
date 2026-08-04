@@ -1,0 +1,45 @@
+/* ═══════════════════════════════════════════════════════════════
+   PRINT STYLESHEET — Optimized for Invoices & Booking Slips
+   ═══════════════════════════════════════════════════════════════ */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+
+  .site-header, .site-footer, .app-shell__topbar, .app-shell__sidebar,
+  .btn, .no-print, .toast-container, nav {
+    display: none !important;
+  }
+
+  .app-shell, .app-shell__main, .container {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .print-invoice {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .invoice-header {
+    border-bottom: 2px solid #000000;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+  }
+
+  .table th {
+    background-color: #f0f0f0 !important;
+    color: #000000 !important;
+    border-bottom: 1px solid #000000 !important;
+  }
+
+  .table td {
+    border-bottom: 1px solid #dddddd !important;
+  }
+}

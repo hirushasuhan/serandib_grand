@@ -1,0 +1,310 @@
+/* ═══════════════════════════════════════════════════════════════
+   BASE STYLES — Reset, Typography, Page Transitions & Preloader
+   ═══════════════════════════════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/**
+ * The `hidden` attribute must always win.
+ *
+ * `[hidden]` is only `display: none` in the browser's user-agent stylesheet,
+ * which ANY author rule with a class selector outranks. That is easy to do by
+ * accident — e.g. `.some-overlay { display: block }` inside a media query
+ * re-displays an element the HTML explicitly marked hidden. When that element
+ * is a full-screen fixed overlay, it becomes an invisible sheet of glass over
+ * the whole page that eats every click, with nothing on screen to explain why.
+ *
+ * Making the reset !important means `hidden` is honoured no matter what else
+ * matches, so the attribute stays a reliable way to hide something.
+ */
+[hidden] {
+  display: none !important;
+}
+
+html {
+  font-size: 100%;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: background-color var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out);
+  /* Short and opacity-only. This app reloads a full server-rendered page on
+     every navigation (no SPA), so this animation is purely decorative polish —
+     it must never be long enough to read as load delay. The previous 0.4s
+     fade + 8px slide, stacked with the preloader and exit-fade below, added
+     over a second of felt "lag" to every single click. */
+  animation: pageFadeIn 0.12s var(--ease-out);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ACCESSIBILITY SKIP LINK
+
+   Must be COMPLETELY invisible until a keyboard user tabs to it.
+
+   Two things were wrong before:
+
+   1. Off-screen positioning (`top/left: -9999px`) is fragile. It relies on
+      `position: absolute` surviving the cascade, and on no ancestor creating a
+      containing block. The moment either assumption breaks — e.g. an ancestor
+      gains `position: relative`, or a page ships broken markup that changes the
+      element's containing block — the link snaps back into view at the top of
+      the page. That is exactly what was happening on the logged-in dashboards.
+
+   2. It revealed on `:focus`, which also matches focus applied by a click or
+      programmatically (including browser focus restoration after the
+      post-login redirect). A skip link is for keyboard navigation, so it should
+      reveal on `:focus-visible` only.
+
+   The clip-rect + 1px box technique below cannot be defeated by a positioning
+   override: the element genuinely occupies 1×1px with its content clipped away.
+   ═══════════════════════════════════════════════════════════════ */
+.skip-link {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Revealed only when reached by keyboard. */
+.skip-link:focus-visible {
+  position: fixed;          /* fixed, so no ancestor can reposition it */
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  z-index: 99999;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 0.75rem 1.25rem;
+  overflow: visible;
+  clip: auto;
+  clip-path: none;
+  background: var(--color-primary);
+  color: #ffffff;
+  border-radius: 0 0 var(--radius-md) 0;
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+  text-decoration: none;
+  box-shadow: var(--shadow-lg);
+  outline: 3px solid var(--accent-500);
+  outline-offset: 2px;
+}
+
+/* Fallback for browsers without :focus-visible support (older Safari).
+   Scoped with :not(:focus-visible) so modern browsers ignore it. */
+@supports not selector(:focus-visible) {
+  .skip-link:focus {
+    position: fixed;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    z-index: 99999;
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 0.75rem 1.25rem;
+    overflow: visible;
+    clip: auto;
+    clip-path: none;
+    background: var(--color-primary);
+    color: #ffffff;
+    font-weight: var(--weight-bold);
+    font-size: var(--text-sm);
+    box-shadow: var(--shadow-lg);
+  }
+}
+
+/* Page entrance — opacity only. A translateY shift on every page load reads
+   as sluggishness; a plain fade does not. */
+@keyframes pageFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Page-exit visual feedback ──
+   This used to DIM THE WHOLE PAGE (opacity → 0) for 250ms the instant a link
+   was clicked, before the browser had even started loading the next page —
+   a fixed quarter-second of "lag" added to every single navigation, on top of
+   whatever the preloader below added on arrival.
+
+   The real page-change signal is the top progress bar, which communicates
+   "loading" without hiding content the user can still read while it happens.
+   `page-exiting` is kept as a hook (main.js still toggles it) but now carries
+   no visual effect, so removing it later needs no JS change. */
+body.page-exiting {
+  animation: none;
+}
+
+/* TOP PROGRESS BAR */
+#top-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: var(--grad-gold);
+  z-index: 99999;
+  box-shadow: 0 0 10px rgba(223, 182, 104, 0.8);
+  transition: width 0.3s ease, opacity 0.3s ease;
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FULLPAGE PRELOADER OVERLAY
+
+   This is a full server-rendered PHP application — every page arrives from
+   Apache already complete, so by the time this CSS is even parsed there is
+   nothing left to "load". The overlay is decorative polish only, and it must
+   NEVER be allowed to sit on screen (or block clicks) for longer than a single
+   frame or two.
+
+   THE BUG THIS FIXES: the overlay previously stayed fully opaque, WITH POINTER
+   EVENTS ENABLED, for a fixed 600ms on every single page before its fade even
+   began, then took another 500ms to finish fading — up to 1.1 seconds during
+   which the visitor could see the finished page underneath yet could not click
+   anything. Combined with the exit-fade above and the 400ms entrance fade, that
+   is the "lag" reported when moving between pages. None of it was waiting for
+   anything real.
+
+   Fix: pointer-events is none from the very first frame (never blocks a click,
+   even mid-fade), and the auto-hide delay is effectively removed.
+   ═══════════════════════════════════════════════════════════════ */
+#site-preloader {
+  position: fixed;
+  inset: 0;
+  background: var(--color-bg);
+  z-index: 99990;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+
+  /* Never intercepts a click, at any point in the animation. */
+  pointer-events: none;
+
+  /* Self-dismissing, near-instantly. `forwards` keeps the final (hidden) state.
+     JS can still hide it sooner via `.fade-out`; this is only the fallback for
+     when JS is blocked or slow to attach. */
+  animation: preloaderAutoHide 0.15s ease 0.05s forwards;
+}
+
+@keyframes preloaderAutoHide {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* JS path: hide immediately, and cancel the animation so the two do not fight. */
+#site-preloader.fade-out {
+  animation: none;
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Users who asked for reduced motion get no spinner and no overlay at all. */
+@media (prefers-reduced-motion: reduce) {
+  #site-preloader { display: none; }
+}
+
+.preloader-spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--color-surface-2);
+  border-top-color: var(--accent-500);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* SCROLL REVEAL ANIMATIONS */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
+}
+
+.reveal.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  color: var(--color-text);
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--dur-fast) ease;
+}
+
+a:hover {
+  color: var(--color-primary-hover);
+}
+
+p {
+  margin-bottom: var(--space-4);
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+img, video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Utility text helpers */
+.text-muted {
+  color: var(--color-text-muted) !important;
+}
+
+.text-subtle {
+  color: var(--color-text-subtle) !important;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.text-right {
+  text-align: right !important;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

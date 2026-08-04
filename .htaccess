@@ -1,0 +1,55 @@
+# ═══════════════════════════════════════════════════════════════
+#  Hotel Reservation System — root Apache configuration
+# ═══════════════════════════════════════════════════════════════
+
+# ── Static security headers ─────────────────────────────────────
+#  Content-Security-Policy is NOT set here: it needs a fresh per-request
+#  nonce for the one inline <script> we ship, and Apache cannot generate
+#  one. It is sent from PHP instead (see includes/header.php).
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    Header always set Cross-Origin-Opener-Policy "same-origin"
+    Header always unset X-Powered-By
+</IfModule>
+
+# ── Hide the PHP version ────────────────────────────────────────
+<IfModule mod_php.c>
+    php_flag expose_php off
+</IfModule>
+
+# ── Block sensitive file types anywhere below this directory ────
+#  FilesMatch tests the filename only, so it is install-path independent.
+#
+#  The previous `RedirectMatch 403 ^/(config|src|...)/` rule was BROKEN:
+#  RedirectMatch compares against the full URL path, which here begins with
+#  /Hotel%20Reservation%20System/, so the pattern never matched and none of
+#  the internal directories were actually protected. Directory protection is
+#  now done by a dedicated .htaccess inside each protected folder, which
+#  works no matter what the project folder is called.
+<FilesMatch "(^\.|composer\.(json|lock)|\.(sql|log|md|ini|sample|bak|old|dist|yml|yaml)$)">
+    Require all denied
+</FilesMatch>
+
+# Keep the two documents we want reachable.
+<Files "README.md">
+    Require all granted
+</Files>
+<Files "PROJECT_SPECIFICATION.md">
+    Require all granted
+</Files>
+
+# ── No directory listings ───────────────────────────────────────
+Options -Indexes
+
+# ── Never serve VCS / editor metadata ───────────────────────────
+RedirectMatch 404 /\.git
+RedirectMatch 404 /\.vscode
+RedirectMatch 404 /\.idea
+
+# ── Friendly error pages ────────────────────────────────────────
+ErrorDocument 403 /Hotel%20Reservation%20System/403.php
+ErrorDocument 404 /Hotel%20Reservation%20System/404.php
+ErrorDocument 500 /Hotel%20Reservation%20System/500.php

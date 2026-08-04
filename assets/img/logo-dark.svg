@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 80" width="300" height="80">
+  <defs>
+    <linearGradient id="gold-grad-d" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f3d79b"/>
+      <stop offset="50%" stop-color="#dcae5a"/>
+      <stop offset="100%" stop-color="#b08130"/>
+    </linearGradient>
+    <linearGradient id="teal-grad-d" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3dd1c2"/>
+      <stop offset="100%" stop-color="#2fb3a6"/>
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(10, 8)">
+    <rect x="2" y="2" width="60" height="60" rx="16" fill="#1f242c" stroke="url(#gold-grad-d)" stroke-width="2"/>
+    <path d="M 32 14 L 38 24 L 48 20 L 42 34 L 50 46 L 32 40 L 14 46 L 22 34 L 16 20 L 26 24 Z" fill="url(#gold-grad-d)"/>
+    <circle cx="32" cy="27" r="4" fill="#2fb3a6"/>
+  </g>
+
+  <text x="85" y="38" font-family="'Playfair Display', Georgia, serif" font-size="22" font-weight="700" fill="#ffffff" letter-spacing="0.5">SERENDIB GRAND</text>
+  <text x="86" y="56" font-family="'Inter', sans-serif" font-size="10" font-weight="600" fill="url(#gold-grad-d)" letter-spacing="3">RESORT &amp; SPA &bull; BENTOTA</text>
+</svg>
