@@ -98,19 +98,30 @@ require __DIR__ . '/includes/nav.php';
        * alone is only a hint and Chrome often ignores it for autoplay video, so
        * the source is withheld from the DOM entirely until we choose to add it.
        *
-       * mp4 is listed first because our encode of it is smaller than the WebM
-       * (1.0 MB vs 2.1 MB) and H.264 is supported everywhere.
+       * public3d.js checks data-src-webm first when present (smaller for the
+       * same quality) and falls back to data-src-mp4 for browsers that don't
+       * support WebM. Current encodes: hero.webm ~3.8 MB, hero.mp4 ~1.7 MB —
+       * still two orders of magnitude below the 82 MB raw source.
        */
     ?>
     <div class="hero3d__video-wrapper"
          data-parallax-speed="0.22"
          style="background-image: url('<?= e(url('assets/img/hero/hero_resort.jpg')) ?>');">
+      <?php /*
+       * FIX: this had regressed back to exactly the bug the comment above
+       * describes — `src` pointed straight at hero_drone.mp4 (the raw 82 MB
+       * source), which loads eagerly and blocks/freezes the page the same
+       * way the original 482 MB file did. `data-src-mp4` also pointed at the
+       * same 82 MB file, so even the deferred path would have downloaded it
+       * once attached. There is no `src` attribute now — only the deferred
+       * data-* attributes, pointing at the actual compressed encodes.
+       */ ?>
       <video id="hero-drone-video"
              autoplay loop muted playsinline
              poster="<?= e(url('assets/img/hero/hero_resort.jpg')) ?>"
              aria-hidden="true" tabindex="-1"
-             src="<?= e(url('assets/vid/hero_drone.mp4')) ?>"
-             data-src-mp4="<?= e(url('assets/vid/hero_drone.mp4')) ?>"></video>
+             data-src-mp4="<?= e(url('assets/vid/hero.mp4')) ?>"
+             data-src-webm="<?= e(url('assets/vid/hero.webm')) ?>"></video>
     </div>
 
     <div class="hero3d__scrim" role="presentation"></div>
@@ -118,7 +129,7 @@ require __DIR__ . '/includes/nav.php';
     <div class="hero3d__inner layer-3d">
 
       <p class="hero3d__eyebrow">
-        <span aria-hidden="true">✦</span> 5-Star Oceanfront Sanctuary &bull; Bentota
+        <span aria-hidden="true"><?= icon('sparkle', 12) ?></span> 5-Star Oceanfront Sanctuary &bull; Bentota
       </p>
 
       <h1 class="hero3d__title" id="hero-title">
@@ -240,7 +251,7 @@ require __DIR__ . '/includes/nav.php';
 
       <?php if (empty($featuredTypes)): ?>
         <div class="empty-state" data-reveal>
-          <div class="empty-state__icon" aria-hidden="true">🏨</div>
+          <div class="empty-state__icon" aria-hidden="true"><?= icon('building', 40) ?></div>
           <h3>No room types published yet</h3>
           <p class="text-muted">Our team is preparing the collection. Please check back shortly.</p>
         </div>
@@ -290,10 +301,10 @@ require __DIR__ . '/includes/nav.php';
                 <h3 class="room-card__title tilt__depth-1"><?= e($type->name) ?></h3>
 
                 <div class="room-card__meta">
-                  <span><span aria-hidden="true">👤</span> <?= (int) $type->max_adults ?> adults</span>
-                  <span><span aria-hidden="true">🛏️</span> <?= e(ucfirst((string) $type->bed_type)) ?></span>
+                  <span class="icon-heading"><?= icon('user', 14) ?> <?= (int) $type->max_adults ?> adults</span>
+                  <span class="icon-heading"><?= icon('bed', 14) ?> <?= e(ucfirst((string) $type->bed_type)) ?></span>
                   <?php if ($type->size_sqft): ?>
-                    <span><span aria-hidden="true">📐</span> <?= (int) $type->size_sqft ?> sq ft</span>
+                    <span class="icon-heading"><?= icon('maximize', 14) ?> <?= (int) $type->size_sqft ?> sq ft</span>
                   <?php endif; ?>
                 </div>
 
@@ -340,19 +351,19 @@ require __DIR__ . '/includes/nav.php';
 
       <?php
         $facilities = [
-            ['icon' => '🏊', 'title' => 'Infinity Pools',   'text' => 'Two oceanfront pools plus a shaded children\'s pool, open from 6am.'],
-            ['icon' => '💆', 'title' => 'Ayurvedic Spa',    'text' => 'Traditional Sri Lankan treatments by certified therapists.'],
-            ['icon' => '🍽️', 'title' => 'Ocean Dining',     'text' => 'Three restaurants serving Sri Lankan, Asian and Continental menus.'],
-            ['icon' => '📶', 'title' => 'Fast Wi-Fi',        'text' => 'Complimentary high-speed fibre throughout the resort.'],
-            ['icon' => '🏋️', 'title' => 'Fitness Centre',   'text' => 'Fully equipped gym with a personal trainer on request.'],
-            ['icon' => '🚐', 'title' => 'Airport Transfer',  'text' => 'Private air-conditioned pickup from Colombo (BIA) on request.'],
+            ['icon' => 'droplet',  'title' => 'Infinity Pools',   'text' => 'Two oceanfront pools plus a shaded children\'s pool, open from 6am.'],
+            ['icon' => 'heart',    'title' => 'Ayurvedic Spa',    'text' => 'Traditional Sri Lankan treatments by certified therapists.'],
+            ['icon' => 'utensils', 'title' => 'Ocean Dining',     'text' => 'Three restaurants serving Sri Lankan, Asian and Continental menus.'],
+            ['icon' => 'wifi',     'title' => 'Fast Wi-Fi',        'text' => 'Complimentary high-speed fibre throughout the resort.'],
+            ['icon' => 'activity', 'title' => 'Fitness Centre',   'text' => 'Fully equipped gym with a personal trainer on request.'],
+            ['icon' => 'truck',    'title' => 'Airport Transfer',  'text' => 'Private air-conditioned pickup from Colombo (BIA) on request.'],
         ];
       ?>
 
       <div class="grid grid--3">
         <?php foreach ($facilities as $i => $facility): ?>
           <div class="facility" data-reveal data-reveal-delay="<?= 70 * $i ?>">
-            <div class="facility__icon" aria-hidden="true"><?= $facility['icon'] ?></div>
+            <div class="facility__icon" aria-hidden="true"><?= icon($facility['icon'], 28) ?></div>
             <h3><?= e($facility['title']) ?></h3>
             <p><?= e($facility['text']) ?></p>
           </div>
@@ -395,8 +406,8 @@ require __DIR__ . '/includes/nav.php';
                   <strong style="display: block; font-size: var(--text-sm);"><?= e($name) ?></strong>
                   <?php /* Rating is written out as text as well as stars, so it is
                            not conveyed by a glyph alone. */ ?>
-                  <span style="color: var(--color-accent); font-size: var(--text-xs);">
-                    <span aria-hidden="true"><?= str_repeat('★', $rating) . str_repeat('☆', 5 - $rating) ?></span>
+                  <span style="display: inline-flex; align-items: center; color: var(--color-accent); font-size: var(--text-xs);">
+                    <span aria-hidden="true" style="display: inline-flex;"><?= str_repeat(icon('star', 14), $rating) . str_repeat(icon('star-outline', 14), 5 - $rating) ?></span>
                     <span class="sr-only"><?= $rating ?> out of 5 stars</span>
                   </span>
                 </span>

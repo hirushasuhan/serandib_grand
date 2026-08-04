@@ -82,9 +82,12 @@ require __DIR__ . '/../includes/header.php';
           </div>
 
           <?php if ($balanceDue > 0): ?>
-            <div class="card mb-6" style="background-color: var(--warning-bg); border-color: var(--warning-500); font-size: var(--text-sm);">
-              ⚠️ Outstanding balance of <strong><?= money($balanceDue) ?></strong> must be settled before checkout.
-              <a href="<?= url('staff/payments.php?booking_id=' . $booking->id) ?>" class="btn btn--primary btn--sm" style="margin-top: 8px; display: inline-block;">💳 Record Payment Now</a>
+            <div class="card mb-6" style="background-color: var(--warning-bg); border-color: var(--warning-500); font-size: var(--text-sm); display: flex; align-items: flex-start; gap: 10px;">
+              <span style="color: var(--warning-500); flex-shrink: 0;"><?= icon('alert-triangle', 18) ?></span>
+              <span>
+                Outstanding balance of <strong><?= money($balanceDue) ?></strong> must be settled before checkout.
+                <a href="<?= url('staff/payments.php?booking_id=' . $booking->id) ?>" class="btn btn--primary btn--sm" style="margin-top: 8px; display: inline-flex;"><?= icon('credit-card', 16) ?> Record Payment Now</a>
+              </span>
             </div>
           <?php endif; ?>
 

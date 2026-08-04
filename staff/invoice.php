@@ -30,7 +30,7 @@ require __DIR__ . '/../includes/header.php';
   
   <div class="no-print" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
     <a href="<?= url('staff/dashboard.php') ?>" class="btn btn--secondary">&larr; Back to Front Desk</a>
-    <button data-print class="btn btn--primary">🖨️ Print Official Invoice (PDF)</button>
+    <button data-print class="btn btn--primary"><?= icon('printer', 16) ?> Print Official Invoice (PDF)</button>
   </div>
 
   <div class="card print-invoice" style="padding: var(--space-10); border: 2px solid var(--color-border);">

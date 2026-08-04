@@ -140,18 +140,18 @@ require __DIR__ . '/includes/nav.php';
 
       <div style="display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: center; margin-top: var(--space-2);">
         <span class="badge badge--info"><?= e(strtoupper((string) $roomType->bed_type)) ?> BED</span>
-        <span class="text-muted" style="font-size: var(--text-sm);">
-          <span aria-hidden="true">👤</span> Max <?= (int) $roomType->max_adults ?> adults,
+        <span class="text-muted" style="display: inline-flex; align-items: center; gap: 4px; font-size: var(--text-sm);">
+          <?= icon('user', 14) ?> Max <?= (int) $roomType->max_adults ?> adults,
           <?= (int) $roomType->max_children ?> children
         </span>
         <?php if ($roomType->size_sqft): ?>
-          <span class="text-muted" style="font-size: var(--text-sm);">
-            <span aria-hidden="true">📐</span> <?= (int) $roomType->size_sqft ?> sq ft
+          <span class="text-muted" style="display: inline-flex; align-items: center; gap: 4px; font-size: var(--text-sm);">
+            <?= icon('maximize', 14) ?> <?= (int) $roomType->size_sqft ?> sq ft
           </span>
         <?php endif; ?>
         <?php if ($avgRating > 0): ?>
-          <span style="color: var(--color-accent); font-weight: var(--weight-bold); font-size: var(--text-sm);">
-            <span aria-hidden="true">★</span> <?= e((string) $avgRating) ?> / 5.0
+          <span style="display: inline-flex; align-items: center; gap: 4px; color: var(--color-accent); font-weight: var(--weight-bold); font-size: var(--text-sm);">
+            <?= icon('star', 14) ?> <?= e((string) $avgRating) ?> / 5.0
             <span class="text-muted">(<?= count($reviews) ?> review<?= count($reviews) === 1 ? '' : 's' ?>)</span>
           </span>
         <?php endif; ?>
@@ -206,7 +206,7 @@ require __DIR__ . '/includes/nav.php';
             <ul class="grid grid--2" style="gap: var(--space-3); margin: var(--space-4) 0 0; padding: 0; list-style: none;">
               <?php foreach ($amenities as $amenity): ?>
                 <li style="display: flex; align-items: center; gap: var(--space-3); font-size: var(--text-sm);">
-                  <span style="color: var(--color-primary); font-weight: bold;" aria-hidden="true">✓</span>
+                  <span style="color: var(--color-primary);" aria-hidden="true"><?= icon('check', 16) ?></span>
                   <span><?= e((string) $amenity->name) ?></span>
                 </li>
               <?php endforeach; ?>
@@ -263,8 +263,8 @@ require __DIR__ . '/includes/nav.php';
                 <article style="padding: var(--space-4); background: var(--color-surface-2); border-radius: var(--radius-md);">
                   <div style="display: flex; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-2);">
                     <strong style="color: var(--color-primary);"><?= e((string) $rev['full_name']) ?></strong>
-                    <span style="color: var(--color-accent); white-space: nowrap;">
-                      <span aria-hidden="true"><?= str_repeat('★', $stars) . str_repeat('☆', 5 - $stars) ?></span>
+                    <span style="display: inline-flex; align-items: center; color: var(--color-accent); white-space: nowrap;">
+                      <span aria-hidden="true" style="display: inline-flex;"><?= str_repeat(icon('star', 14), $stars) . str_repeat(icon('star-outline', 14), 5 - $stars) ?></span>
                       <span class="sr-only"><?= $stars ?> out of 5 stars</span>
                     </span>
                   </div>

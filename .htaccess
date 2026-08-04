@@ -50,6 +50,6 @@ RedirectMatch 404 /\.vscode
 RedirectMatch 404 /\.idea
 
 # ── Friendly error pages ────────────────────────────────────────
-ErrorDocument 403 /serandib_grand/403.php
-ErrorDocument 404 /serandib_grand/404.php
-ErrorDocument 500 /serandib_grand/500.php
+ErrorDocument 403 /Hotel%20Reservation%20System/403.php
+ErrorDocument 404 /Hotel%20Reservation%20System/404.php
+ErrorDocument 500 /Hotel%20Reservation%20System/500.php

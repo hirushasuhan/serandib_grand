@@ -207,7 +207,7 @@ require __DIR__ . '/includes/nav.php';
     <!-- ── ROOM GRID ── -->
     <?php if (empty($roomTypes)): ?>
       <div class="empty-state">
-        <div class="empty-state__icon" aria-hidden="true">🔍</div>
+        <div class="empty-state__icon" aria-hidden="true"><?= icon('search', 40) ?></div>
         <h3>No room types match those filters</h3>
         <p class="text-muted" style="margin-bottom: var(--space-5);">
           Try widening your price range, lowering the guest count, or choosing “All bed types”.
@@ -270,13 +270,13 @@ require __DIR__ . '/includes/nav.php';
               </h2>
 
               <div class="room-card__meta">
-                <span><span aria-hidden="true">👤</span> Max <?= (int) $type->max_adults ?> adults</span>
+                <span class="icon-heading"><?= icon('user', 14) ?> Max <?= (int) $type->max_adults ?> adults</span>
                 <?php if ((int) $type->max_children > 0): ?>
-                  <span><span aria-hidden="true">🧒</span> <?= (int) $type->max_children ?> children</span>
+                  <span class="icon-heading"><?= icon('baby', 14) ?> <?= (int) $type->max_children ?> children</span>
                 <?php endif; ?>
-                <span><span aria-hidden="true">🛏️</span> <?= e(ucfirst((string) $type->bed_type)) ?></span>
+                <span class="icon-heading"><?= icon('bed', 14) ?> <?= e(ucfirst((string) $type->bed_type)) ?></span>
                 <?php if ($type->size_sqft): ?>
-                  <span><span aria-hidden="true">📐</span> <?= (int) $type->size_sqft ?> sq ft</span>
+                  <span class="icon-heading"><?= icon('maximize', 14) ?> <?= (int) $type->size_sqft ?> sq ft</span>
                 <?php endif; ?>
               </div>
 

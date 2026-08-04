@@ -72,7 +72,7 @@ require __DIR__ . '/includes/nav.php';
     <div class="hero3d__inner layer-3d" style="max-width: 900px; padding-block: var(--space-16);">
       
       <div style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 18px; background: rgba(200, 150, 62, 0.22); border: 1px solid var(--accent-500); border-radius: var(--radius-full); font-size: var(--text-xs); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #f3d79b; margin-bottom: var(--space-4); backdrop-filter: blur(10px);">
-        ✦ 24/7 Front Desk &amp; Concierge
+        <?= icon('sparkle', 12) ?> 24/7 Front Desk &amp; Concierge
       </div>
 
       <h1 class="hero3d__title" id="contact-title" style="font-size: clamp(2.4rem, 5vw, 4rem);">
@@ -99,7 +99,7 @@ require __DIR__ . '/includes/nav.php';
           
           <div class="card" style="padding: var(--space-8); border-left: 4px solid var(--accent-500);">
             <div style="display: flex; align-items: center; gap: 14px; margin-bottom: var(--space-4);">
-              <div style="height: 48px; width: 48px; border-radius: 12px; background: var(--color-primary-soft); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--color-primary);">📍</div>
+              <div style="height: 48px; width: 48px; border-radius: 12px; background: var(--color-primary-soft); display: flex; align-items: center; justify-content: center; color: var(--color-primary);"><?= icon('map-pin', 22) ?></div>
               <div>
                 <strong style="font-family: var(--font-display); font-size: var(--text-lg); display: block; color: var(--color-text);">Resort Location</strong>
                 <span style="font-size: var(--text-xs); color: var(--color-text-subtle); uppercase; letter-spacing: 1px;">Bentota Sanctuary</span>
@@ -112,7 +112,7 @@ require __DIR__ . '/includes/nav.php';
 
           <div class="card" style="padding: var(--space-8); border-left: 4px solid var(--color-primary);">
             <div style="display: flex; align-items: center; gap: 14px; margin-bottom: var(--space-4);">
-              <div style="height: 48px; width: 48px; border-radius: 12px; background: var(--color-primary-soft); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--color-primary);">📞</div>
+              <div style="height: 48px; width: 48px; border-radius: 12px; background: var(--color-primary-soft); display: flex; align-items: center; justify-content: center; color: var(--color-primary);"><?= icon('phone', 22) ?></div>
               <div>
                 <strong style="font-family: var(--font-display); font-size: var(--text-lg); display: block; color: var(--color-text);">Telephone &amp; Hotline</strong>
                 <span style="font-size: var(--text-xs); color: var(--color-text-subtle); uppercase; letter-spacing: 1px;">24/7 Guest Assistance</span>
@@ -126,7 +126,7 @@ require __DIR__ . '/includes/nav.php';
 
           <div class="card" style="padding: var(--space-8); border-left: 4px solid var(--accent-500);">
             <div style="display: flex; align-items: center; gap: 14px; margin-bottom: var(--space-4);">
-              <div style="height: 48px; width: 48px; border-radius: 12px; background: var(--color-primary-soft); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--color-primary);">✉️</div>
+              <div style="height: 48px; width: 48px; border-radius: 12px; background: var(--color-primary-soft); display: flex; align-items: center; justify-content: center; color: var(--color-primary);"><?= icon('mail', 22) ?></div>
               <div>
                 <strong style="font-family: var(--font-display); font-size: var(--text-lg); display: block; color: var(--color-text);">Email Inquiries</strong>
                 <span style="font-size: var(--text-xs); color: var(--color-text-subtle); uppercase; letter-spacing: 1px;">Instant Response</span>

@@ -94,7 +94,7 @@ require __DIR__ . '/../includes/header.php';
           <h1 class="page-title">Reservations Management</h1>
           <p class="page-hint" style="margin-bottom: 0;">Search, confirm online pending bookings, or process guest check-in/out.</p>
         </div>
-        <a href="<?= url('staff/walkin.php') ?>" class="btn btn--primary">🚶 New Walk-In Booking</a>
+        <a href="<?= url('staff/walkin.php') ?>" class="btn btn--primary"><?= icon('log-in', 16) ?> New Walk-In Booking</a>
       </div>
 
       <!-- FILTER & SEARCH BAR -->

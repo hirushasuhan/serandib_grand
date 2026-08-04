@@ -31,7 +31,7 @@ require __DIR__ . '/includes/nav.php';
     <div class="hero3d__inner layer-3d" style="max-width: 920px; padding-block: var(--space-16);">
       
       <div style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 18px; background: rgba(200, 150, 62, 0.22); border: 1px solid var(--accent-500); border-radius: var(--radius-full); font-size: var(--text-xs); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #f3d79b; margin-bottom: var(--space-4); backdrop-filter: blur(10px);">
-        ✦ Our Heritage &amp; Vision
+        <?= icon('sparkle', 12) ?> Our Heritage &amp; Vision
       </div>
 
       <h1 class="hero3d__title" id="about-title" style="font-size: clamp(2.4rem, 5.5vw, 4.2rem);">
@@ -67,7 +67,9 @@ require __DIR__ . '/includes/nav.php';
 
           <div style="display: flex; gap: var(--space-6); align-items: center; padding-top: var(--space-4); border-top: 1px solid var(--color-border);">
             <div>
-              <div style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--color-primary);">5 ★★★★★</div>
+              <div style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--color-primary); display: flex; align-items: center; gap: 6px;">
+                5 <span style="display: inline-flex; color: var(--accent-500);"><?= str_repeat(icon('star', 18), 5) ?></span>
+              </div>
               <div style="font-size: var(--text-xs); color: var(--color-text-subtle); text-transform: uppercase; letter-spacing: 1px;">Luxury Accreditation</div>
             </div>
             <div style="width: 1px; height: 40px; background: var(--color-border);"></div>
@@ -111,7 +113,7 @@ require __DIR__ . '/includes/nav.php';
       <div class="grid grid--4">
         
         <div class="card" style="padding: var(--space-8); border-top: 4px solid var(--brand-500);" data-reveal>
-          <div style="font-size: 2.8rem; margin-bottom: var(--space-4);">🏆</div>
+          <div style="color: var(--brand-500); margin-bottom: var(--space-4);"><?= icon('award', 44) ?></div>
           <h3 style="font-family: var(--font-display); font-size: var(--text-xl); margin-bottom: var(--space-2);">Uncompromising Luxury</h3>
           <p class="text-muted" style="font-size: var(--text-sm); line-height: 1.6;">
             Combining 5-star international standards with genuine Sri Lankan warmth to deliver personalized butler services and bespoke care.
@@ -119,7 +121,7 @@ require __DIR__ . '/includes/nav.php';
         </div>
 
         <div class="card" style="padding: var(--space-8); border-top: 4px solid var(--accent-500);" data-reveal>
-          <div style="font-size: 2.8rem; margin-bottom: var(--space-4);">🧘‍♀️</div>
+          <div style="color: var(--accent-500); margin-bottom: var(--space-4);"><?= icon('heart', 44) ?></div>
           <h3 style="font-family: var(--font-display); font-size: var(--text-xl); margin-bottom: var(--space-2);">Ayurvedic Wellness</h3>
           <p class="text-muted" style="font-size: var(--text-sm); line-height: 1.6;">
             Ancient holistic healing therapies, herbal oil treatments, and beachfront yoga pavilions supervised by certified Ayurvedic doctors.
@@ -127,7 +129,7 @@ require __DIR__ . '/includes/nav.php';
         </div>
 
         <div class="card" style="padding: var(--space-8); border-top: 4px solid var(--brand-500);" data-reveal>
-          <div style="font-size: 2.8rem; margin-bottom: var(--space-4);">🍽️</div>
+          <div style="color: var(--brand-500); margin-bottom: var(--space-4);"><?= icon('utensils', 44) ?></div>
           <h3 style="font-family: var(--font-display); font-size: var(--text-xl); margin-bottom: var(--space-2);">Culinary Artistry</h3>
           <p class="text-muted" style="font-size: var(--text-sm); line-height: 1.6;">
             Fresh coastal seafood delicacies, authentic Ceylonese spices, and international buffet dining curated by master chefs.
@@ -135,7 +137,7 @@ require __DIR__ . '/includes/nav.php';
         </div>
 
         <div class="card" style="padding: var(--space-8); border-top: 4px solid var(--accent-500);" data-reveal>
-          <div style="font-size: 2.8rem; margin-bottom: var(--space-4);">🌱</div>
+          <div style="color: var(--accent-500); margin-bottom: var(--space-4);"><?= icon('leaf', 44) ?></div>
           <h3 style="font-family: var(--font-display); font-size: var(--text-xl); margin-bottom: var(--space-2);">Eco-Sustainability</h3>
           <p class="text-muted" style="font-size: var(--text-sm); line-height: 1.6;">
             Dedicated to marine turtle conservation, zero single-use plastics, and supporting local Sri Lankan coastal communities.
