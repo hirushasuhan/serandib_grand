@@ -1,0 +1,1265 @@
+/* ═══════════════════════════════════════════════════════════════
+   COMPONENTS — Luxury UI Component System & Micro-animations
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 0.75rem 1.5rem;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold, 600);
+  line-height: 1;
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--dur-base) var(--ease-out);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(60deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 80%);
+  transform: rotate(30deg) translateY(-100%);
+  transition: transform 0.6s var(--ease-out);
+}
+
+.btn:hover::after {
+  transform: rotate(30deg) translateY(100%);
+}
+
+.btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+/* ── BUTTON VARIANTS ── */
+.btn--primary,
+.btn--primary:visited {
+  background: var(--grad-primary);
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(15, 118, 110, 0.35);
+}
+
+.btn--primary:hover,
+.btn--primary:focus {
+  background: var(--brand-700) !important;
+  color: #ffffff !important;
+  box-shadow: 0 6px 20px rgba(15, 118, 110, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn--secondary,
+.btn--secondary:visited {
+  background-color: var(--color-surface);
+  color: var(--color-text) !important;
+  border-color: var(--color-border-strong);
+}
+
+.btn--secondary:hover,
+.btn--secondary:focus {
+  background-color: var(--color-surface-hover);
+  color: var(--color-primary) !important;
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+}
+
+.btn--gold,
+.btn--gold:visited {
+  background: var(--grad-gold);
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(200, 150, 62, 0.35);
+}
+
+.btn--gold:hover,
+.btn--gold:focus {
+  background: linear-gradient(135deg, #c8963e 0%, #9a6f22 100%) !important;
+  color: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(200, 150, 62, 0.5);
+}
+
+.btn--ghost,
+.btn--ghost:visited {
+  background: transparent;
+  color: var(--color-text);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.btn--ghost:hover,
+.btn--ghost:focus {
+  background-color: var(--color-surface-2);
+  color: var(--color-primary) !important;
+}
+
+.btn--danger,
+.btn--danger:visited {
+  background-color: var(--danger-500);
+  color: #ffffff !important;
+}
+
+.btn--danger:hover,
+.btn--danger:focus {
+  background-color: #dc2626 !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+}
+
+/* CTA BAND SPECIAL BUTTON STYLES */
+.cta-band .btn--ghost,
+.cta-band .btn--ghost:visited {
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  background: transparent !important;
+}
+
+.cta-band .btn--ghost:hover,
+.cta-band .btn--ghost:focus {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+  transform: translateY(-2px);
+}
+
+.btn--sm {
+  padding: 0.45rem 0.9rem;
+  font-size: var(--text-xs);
+  border-radius: var(--radius-sm);
+}
+
+.btn--lg {
+  padding: 1rem 2rem;
+  font-size: var(--text-base);
+  border-radius: var(--radius-md);
+}
+
+.btn--block {
+  display: flex;
+  width: 100%;
+}
+
+/* ── AMBIENT RESORT VIDEO BACKGROUND ANIMATION ── */
+.login-video-wrapper {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.login-video-bg-img {
+  position: absolute;
+  inset: -10%;
+  width: 120%;
+  height: 120%;
+  background-image: url('../img/hero/hero_resort.jpg');
+  background-size: cover;
+  background-position: center;
+  animation: ambientPanZoom 24s ease-in-out infinite alternate;
+  filter: brightness(0.65) contrast(1.1);
+}
+
+/* Deferred background video (login page).
+   Hidden until a frame is actually playing, otherwise it paints as a black
+   rectangle over the poster while buffering. If the video is skipped entirely
+   — mobile, slow connection, reduced motion, missing file — this stays at
+   opacity 0 and .login-video-bg-img above remains the finished background. */
+[data-bg-video] {
+  opacity: 0;
+  transition: opacity 900ms var(--ease-out);
+}
+
+[data-bg-video].is-ready {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-video-bg-img { animation: none; }
+  [data-bg-video] { display: none; }
+}
+
+@keyframes ambientPanZoom {
+  0% {
+    transform: scale(1) translate(0, 0);
+  }
+  50% {
+    transform: scale(1.12) translate(-2%, -1.5%);
+  }
+  100% {
+    transform: scale(1.05) translate(1.5%, 1%);
+  }
+}
+
+.login-wave-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(circle at 20% 30%, rgba(200, 150, 62, 0.2), transparent 50%),
+              radial-gradient(circle at 80% 70%, rgba(15, 118, 110, 0.3), transparent 60%);
+  animation: wavePulse 8s ease-in-out infinite alternate;
+}
+
+@keyframes wavePulse {
+  0% { opacity: 0.6; transform: scale(1); }
+  100% { opacity: 0.95; transform: scale(1.08); }
+}
+
+/* ── ROCK-SOLID AUTH CARD CONTAINER ── */
+.auth-card-clean {
+  position: relative;
+  z-index: 100;
+  width: 100%;
+  background-color: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
+  border-top: 4px solid var(--accent-500) !important;
+  border-radius: var(--radius-xl) !important;
+  padding: var(--space-8) !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* ── CARDS & GLASSMORPHISM ── */
+.card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--dur-base) var(--ease-out);
+  position: relative;
+}
+
+.card--glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-lg);
+}
+
+.card--interactive:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-primary);
+}
+
+.card--stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-6);
+  background: var(--color-surface);
+  border-left: 4px solid var(--color-primary);
+}
+
+.stat__label {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+.stat__val {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-text);
+  margin-top: 4px;
+  font-family: var(--font-sans);
+}
+
+/* ── BADGES ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.35rem 0.75rem;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold, 600);
+  border-radius: var(--radius-full);
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+}
+
+.badge--available, .badge--success, .badge--confirmed, .badge--active {
+  background-color: var(--success-bg);
+  color: var(--success-500);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.badge--occupied, .badge--info, .badge--checked_in {
+  background-color: var(--info-bg);
+  color: var(--info-500);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.badge--cleaning, .badge--warning, .badge--pending {
+  background-color: var(--warning-bg);
+  color: var(--warning-500);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.badge--maintenance, .badge--danger, .badge--cancelled, .badge--rejected, .badge--suspended {
+  background-color: var(--danger-bg);
+  color: var(--danger-500);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* ── FORMS & INPUTS ── */
+.form-group {
+  margin-bottom: var(--space-5);
+}
+
+.form-label {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold, 600);
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.form-control, .form-select, .form-textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: all var(--dur-fast) ease;
+}
+
+.form-control:focus, .form-select:focus, .form-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--focus-ring);
+  background-color: var(--color-surface);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SELECT DROPDOWNS — theme-aware
+
+   THE BUG THIS FIXES: <select> had an explicit background-color, but the
+   <option> elements inside it had none. Chrome on Windows paints the popup
+   list using the select's background while leaving option text at the OS
+   default (black) — so in dark mode the list came out dark-on-dark and was
+   effectively unreadable. Setting colours on the options themselves is the
+   only reliable way to theme the popup; `color-scheme` alone does not
+   override an author-specified background.
+   ═══════════════════════════════════════════════════════════════ */
+.form-select {
+  /* Remove the native arrow so the control looks identical in both themes,
+     then draw our own from currentColor — it re-tints automatically. */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background-image:
+    linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position:
+    calc(100% - 20px) calc(50% + 2px),
+    calc(100% - 14px) calc(50% + 2px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+
+  /* Room for the arrow so long option text never runs underneath it. */
+  padding-right: 2.75rem;
+  cursor: pointer;
+}
+
+/* The popup list itself. Must be explicit — see the comment above. */
+.form-select option,
+select option {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+/* "Any" / placeholder-style empty options read as hints, not values. */
+.form-select option[value=""] {
+  color: var(--color-text-subtle);
+}
+
+/* Windows/Linux Firefox keeps its own highlight colour unless told otherwise. */
+.form-select option:checked,
+.form-select option:hover {
+  background-color: var(--color-primary-soft);
+  color: var(--color-text);
+}
+
+/* Multi-selects and size>1 render inline, so they need the surface too. */
+.form-select[multiple],
+.form-select[size]:not([size="1"]) {
+  background-image: none;
+  padding-right: 1rem;
+}
+
+.form-control--error {
+  border-color: var(--danger-500) !important;
+  background-color: var(--danger-bg) !important;
+}
+
+.form-error {
+  font-size: var(--text-xs);
+  color: var(--danger-500);
+  margin-top: 4px;
+}
+
+.form-hint {
+  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
+  margin-top: 4px;
+}
+
+/* ── TABLES ── */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: var(--text-sm);
+}
+
+.table th {
+  padding: var(--space-4) var(--space-5);
+  background-color: var(--color-surface-2);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold, 600);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.table td {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  vertical-align: middle;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table--hoverable tbody tr:hover {
+  background-color: var(--color-surface-2);
+}
+
+/* ── MODAL DIALOGS ──
+ *
+ * FIX: assets/js/components.js opens a modal by setting `data-open="true"`
+ * on it (`modal.setAttribute('data-open', 'true')`) — the same attribute-
+ * based convention used everywhere else in this app (the mobile sidebar
+ * drawer, its backdrop, etc). This CSS was instead keyed to a `.is-open`
+ * CLASS that nothing in the JS ever added. Clicking "Create Room Type",
+ * "Add Single Room", "Bulk Room Generator", or any other
+ * `[data-modal-target]` button correctly flipped the attribute every time —
+ * it just never matched a CSS rule, so the modal stayed `display: none`
+ * and every "Add" button on every dashboard looked like it did nothing.
+ */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+
+.modal[data-open="true"] {
+  display: flex;
+}
+
+.modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.modal__dialog {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-xl);
+  z-index: 2;
+  animation: modalPop 0.3s var(--ease-spring);
+}
+
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.92) translateY(10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ── STEPPER ── */
+.stepper {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--space-8);
+  position: relative;
+}
+
+.stepper::before {
+  content: '';
+  position: absolute;
+  top: 20px;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background-color: var(--color-border);
+  z-index: 0;
+}
+
+.stepper__step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  position: relative;
+  z-index: 1;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-muted);
+}
+
+.stepper__num {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-surface-2);
+  border: 2px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--weight-bold);
+  color: var(--color-text-muted);
+}
+
+.stepper__step--active .stepper__num {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #ffffff;
+  box-shadow: 0 0 0 4px var(--color-primary-soft);
+}
+
+.stepper__step--active {
+  color: var(--color-primary);
+  font-weight: var(--weight-bold);
+}
+
+/* ── ROOM TILE BOARD GRID ── */
+.status-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: var(--space-4);
+}
+
+.room-tile {
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  border: 2px solid transparent;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-out);
+}
+
+.room-tile:hover {
+  transform: translateY(-3px) scale(1.02);
+}
+
+.room-tile--available {
+  background-color: var(--success-bg);
+  border-color: var(--success-500);
+  color: #064e3b;
+}
+
+.room-tile--occupied {
+  background-color: var(--info-bg);
+  border-color: var(--info-500);
+  color: #1e3a8a;
+}
+
+.room-tile--cleaning {
+  background-color: var(--warning-bg);
+  border-color: var(--warning-500);
+  color: #78350f;
+}
+
+.room-tile--maintenance {
+  background-color: var(--danger-bg);
+  border-color: var(--danger-500);
+  color: #7f1d1d;
+}
+
+.room-tile__num {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  font-family: var(--font-sans);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NAVBAR
+
+   These rules used to live as inline style="" attributes in
+   includes/nav.php. Inline styles cannot carry media queries, which is why
+   the navbar had no mobile behaviour at all: the link row stayed a single
+   flex line and overflowed the viewport on every phone.
+   ═══════════════════════════════════════════════════════════════ */
+.navbar {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+}
+
+.navbar__inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: var(--header-h);
+}
+
+.navbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  min-width: 0;           /* lets the text truncate instead of pushing the row */
+  flex-shrink: 1;
+}
+
+.navbar__brand img {
+  height: 48px;
+  width: 48px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1.5px solid var(--accent-500);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
+.navbar__brand-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.navbar__brand-name {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--brand-500);
+  letter-spacing: 0.5px;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navbar__brand-sub {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--accent-500);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.navbar__menu {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.nav-link {
+  font-weight: var(--weight-medium);
+  color: var(--color-text);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-link:hover { color: var(--color-primary); }
+
+/* ── Icons shared by the user chip, logout and theme buttons ──
+   Inline SVGs replace what used to be raw emoji (👤 🚪 🌙). Emoji render
+   inconsistently across OSes/fonts and don't take the button's text colour;
+   `stroke="currentColor"` on these means they always match the surrounding
+   text and theme automatically. */
+.icon {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.navbar__user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navbar__user-role {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+/* Two representations of the same role, only one shown at a time — see the
+   mobile media query below for the swap. */
+.navbar__user-role-initial { display: none; }
+
+.navbar__logout {
+  display: inline-flex;
+}
+
+.navbar__logout button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.navbar__theme {
+  padding: 8px;
+  position: relative;
+}
+
+/* Sun/moon swap driven entirely by the [data-theme] attribute on <html> —
+   no JS involved, so it can't silently desync the way the old emoji swap
+   did (see the comment in assets/js/theme.js). Light theme shows the moon
+   (tap it to go dark); dark theme shows the sun (tap it to go light). */
+.navbar__theme .icon--sun { display: none; }
+.navbar__theme .icon--moon { display: inline-block; }
+
+[data-theme='dark'] .navbar__theme .icon--sun { display: inline-block; }
+[data-theme='dark'] .navbar__theme .icon--moon { display: none; }
+
+/* ── Hamburger button ──
+   Hidden on desktop; the media query below reveals it. */
+.navbar__burger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 44px;             /* 44px is the minimum comfortable touch target */
+  height: 44px;
+  padding: 0;
+  flex-shrink: 0;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.navbar__burger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  margin-inline: auto;
+  background: var(--color-text);
+  border-radius: 2px;
+  transition: transform var(--dur-fast) ease, opacity var(--dur-fast) ease;
+}
+
+.navbar__burger[aria-expanded="true"] span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.navbar__burger[aria-expanded="true"] span:nth-child(2) {
+  opacity: 0;
+}
+.navbar__burger[aria-expanded="true"] span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ── Sidebar drawer chrome (mobile only) ── */
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--overlay);
+  opacity: 0;
+  transition: opacity var(--dur-base, 0.25s) ease;
+  z-index: calc(var(--z-overlay) - 1);
+
+  /* Belt and braces: even if this element is ever displayed while closed, it
+     must never intercept a tap. Re-enabled only in the [data-open] rule. */
+  pointer-events: none;
+}
+
+.sidebar-backdrop[data-open="true"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sidebar__close {
+  display: none;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  font-size: 1.75rem;
+  line-height: 1;
+  color: var(--color-text);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  z-index: 2;
+}
+
+.sidebar__close:hover { background: var(--color-surface-2); }
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE — TABLET (<= 1024px)
+   The breakpoint where the sidebar becomes a drawer, so it is also where
+   the hamburger has to appear.
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .navbar__burger { display: flex; }
+
+  /*
+   * `:not([hidden])` is essential and must not be simplified away.
+   *
+   * THE BUG THIS FIXES: this rule was plain `.sidebar-backdrop { display: block }`.
+   * The element ships with the HTML `hidden` attribute, but `[hidden]` is only
+   * `display: none` in the USER-AGENT stylesheet — a class selector in an
+   * author stylesheet outranks it. So the backdrop was displayed from the
+   * moment the page loaded: position:fixed, inset:0, opacity:0, z-index 299.
+   * Invisible, full-screen, and stacked above the navbar (z-index 100) and
+   * all page content — it silently swallowed every tap on every dashboard
+   * page below 1024px. The whole UI looked frozen on mobile.
+   */
+  .sidebar-backdrop:not([hidden]) { display: block; }
+
+  .sidebar__close { display: block; }
+
+  /* On a dashboard page every one of these links already exists in the
+     sidebar drawer, so repeating them in the top bar just crowds it. */
+  .nav-link--public { display: none; }
+
+  .navbar__brand img { height: 40px; width: 40px; }
+  .navbar__brand-name { font-size: 1.05rem; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE — MOBILE (<= 768px)
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* ── Navbar ── */
+  .navbar__inner {
+    gap: var(--space-2);
+    min-height: 64px;
+  }
+
+  .navbar__brand-sub { display: none; }
+  .navbar__brand-name { font-size: 0.95rem; }
+  .navbar__brand img { height: 36px; width: 36px; }
+
+  /* The user's full name is the single widest thing in the bar. */
+  .navbar__user-name,
+  .navbar__logout-text { display: none; }
+
+  /*
+   * FIX: with the name hidden above, the role badge (e.g. "guest",
+   * "receptionist") was left on its own next to the hotel logo — just a
+   * bare word floating in the bar with no visual container tying it to
+   * "you are signed in as this role". It read as unfinished, not deliberate.
+   *
+   * Below this breakpoint the badge collapses to a small circular initial
+   * (e.g. "G") instead — the same compact-avatar convention most apps use
+   * for identity chips once there isn't room for the full label.
+   */
+  .navbar__user-role-text { display: none; }
+
+  .navbar__user-role {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: var(--weight-bold);
+  }
+
+  .navbar__user-role-initial { display: block; }
+
+  .navbar__menu { gap: var(--space-3); }
+
+  /* Public pages: the link list becomes a dropdown panel. */
+  .navbar__burger--menu ~ .navbar__menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .navbar__burger--menu ~ .navbar__menu[data-open="true"] { display: flex; }
+
+  .navbar__burger--menu ~ .navbar__menu .nav-link--public {
+    display: block;
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+  }
+
+  .navbar__burger--menu ~ .navbar__menu .nav-link--public:hover {
+    background: var(--color-surface-2);
+  }
+
+  /* NOTE: deliberately no `position: relative` on .navbar here. It already
+     has `position: sticky`, which is a positioned element and therefore
+     already the containing block for the absolutely positioned dropdown
+     above. Adding `relative` would override the sticky and drop the header
+     out of view as soon as the user scrolled — on mobile only. */
+
+  /* ── App shell ── */
+  .app-shell__main { padding: var(--space-4); }
+
+  /* ── Typography: large display sizes overflow narrow screens ── */
+  .page-title { font-size: var(--text-xl); }
+  .stat__val  { font-size: var(--text-xl); }
+
+  h1 { font-size: var(--text-2xl); }
+  h2 { font-size: var(--text-xl); }
+  h3 { font-size: var(--text-lg); }
+
+  /* ── Cards & spacing ── */
+  .card { padding: var(--space-4); }
+
+  .card--stat {
+    padding: var(--space-4);
+    gap: var(--space-3);
+  }
+
+  /* ── Buttons: full width reads better than a row of tiny targets ── */
+  .btn { padding: 0.7rem 1.1rem; }
+
+  .btn--lg {
+    width: 100%;
+    padding: 0.9rem 1.25rem;
+  }
+
+  /* ── Forms: 16px minimum stops iOS Safari zooming on focus ── */
+  .form-control,
+  .form-select,
+  .form-textarea {
+    font-size: 16px;
+  }
+
+  .form-group { margin-bottom: var(--space-4); }
+
+  /* ── Modals ── */
+  .modal__dialog {
+    width: 100%;
+    max-width: none;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: var(--space-5);
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     RESPONSIVE TABLES
+
+     The markup already carried data-responsive on the table and
+     data-label="…" on each cell, but NO CSS ever implemented them — the
+     attributes did nothing and wide tables just scrolled sideways. Each
+     row now becomes its own card with the column name shown beside the
+     value, so nothing needs horizontal scrolling to read.
+     ═══════════════════════════════════════════════════════════ */
+  .table[data-responsive] { border: none; }
+
+  .table[data-responsive] thead {
+    /* Visually hidden, still announced to screen readers. */
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .table[data-responsive] tr {
+    display: block;
+    margin-bottom: var(--space-4);
+    padding: var(--space-3);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+
+  .table[data-responsive] td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--color-border);
+    text-align: right;
+  }
+
+  .table[data-responsive] td:last-child { border-bottom: none; }
+
+  /* The column name, taken straight from the existing data-label attribute. */
+  .table[data-responsive] td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-align: left;
+  }
+
+  /* Cells with no data-label (action buttons, empty-state messages) keep
+     the full width rather than leaving a blank gutter. */
+  .table[data-responsive] td:not([data-label]) {
+    display: block;
+    text-align: center;
+  }
+
+  .table[data-responsive] td:not([data-label])::before { content: none; }
+
+  /* Action buttons inside a stacked row wrap instead of overflowing. */
+  .table[data-responsive] td > div {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  /* ── Room status board ── */
+  .status-board {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE — SMALL MOBILE (<= 480px)
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .navbar__brand-name { font-size: 0.85rem; }
+
+  .app-shell__main { padding: var(--space-3); }
+
+  .card { padding: var(--space-3); }
+
+  .app-shell__sidebar {
+    width: min(86vw, var(--sidebar-w));
+  }
+
+  /* A stat card's emoji is decoration; the number matters more. */
+  .card--stat > div:last-child { font-size: 1.5rem !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE FIXES FOR INLINE-STYLED LAYOUTS
+
+   Roughly two dozen pages build their page headers and toolbars with an
+   inline style="display: flex; justify-content: space-between" attribute.
+   An inline style cannot carry a media query, so those rows could never
+   respond to screen width — on a phone the title and the button beside it
+   were forced onto one line and pushed the page into horizontal scroll.
+
+   flex-wrap is not declared in any of those inline attributes, so setting
+   it here wins without needing !important and without touching 26 files.
+   Scoped to page content so it cannot affect the navbar or sidebar, which
+   have their own deliberate layouts above.
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .app-shell__main [style*="display: flex"],
+  .app-shell__main [style*="display:flex"],
+  main [style*="display: flex"],
+  main [style*="display:flex"] {
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  /* Inline auto-fit grids already collapse on their own; this catches the
+     fixed multi-column ones. */
+  .app-shell__main [style*="grid-template-columns: repeat(2"],
+  .app-shell__main [style*="grid-template-columns: repeat(3"],
+  .app-shell__main [style*="grid-template-columns: repeat(4"],
+  main [style*="grid-template-columns: repeat(2"],
+  main [style*="grid-template-columns: repeat(3"],
+  main [style*="grid-template-columns: repeat(4"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Long unbroken strings (booking refs, emails) must not widen the page. */
+  .table td, .card, .page-hint { overflow-wrap: anywhere; }
+}
+
+/* Nothing should ever cause sideways scrolling on a phone.
+ *
+ * Deliberately `body` only, never `html`. Setting overflow on the root
+ * element makes it a scroll container, and `position: sticky` cannot stick
+ * against an ancestor that scrolls — the sticky navbar would simply scroll
+ * away on mobile. When html keeps `overflow: visible`, the body's value is
+ * propagated to the viewport instead and sticky keeps working. */
+@media (max-width: 768px) {
+  body { overflow-x: hidden; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ICON-LABEL PAIRS
+
+   Generic pattern for "<icon> some text" — used by the footer's contact
+   lines/accreditations and reused anywhere else an icon() call sits next to
+   a short label instead of a standalone emoji.
+   ═══════════════════════════════════════════════════════════════ */
+.footer__contact-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer__accreditations {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.footer__accreditations .icon { color: var(--accent-500); flex-shrink: 0; }
+
+/* ═══════════════════════════════════════════════════════════════
+   TOAST NOTIFICATIONS (Flash messages)
+
+   FOUND WHILE REPLACING EMOJI: includes/flash.php renders .toast-container
+   and .toast/.toast--<type> on every page, and assets/js/components.js
+   already fades and auto-removes each one after 4s — but no CSS for any of
+   these classes existed anywhere in the stylesheet (only the --z-toast
+   token in tokens.css). Every flash message (login errors, "booking
+   confirmed", validation failures, the security-logout notice) has been
+   rendering as an unstyled, unpositioned block sitting inline in the page
+   flow instead of a toast. Adding it here since the icon it now carries
+   would otherwise render oversized and misaligned with no container to
+   attach to.
+   ═══════════════════════════════════════════════════════════════ */
+.toast-container {
+  position: fixed;
+  top: calc(var(--header-h, 76px) + var(--space-4));
+  right: var(--space-4);
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: min(380px, calc(100vw - var(--space-8)));
+}
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  animation: toastIn 0.3s var(--ease-out);
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.toast__icon {
+  display: flex;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.toast--success { border-left-color: var(--success-500); }
+.toast--success .toast__icon { color: var(--success-500); }
+
+.toast--error { border-left-color: var(--danger-500); }
+.toast--error .toast__icon { color: var(--danger-500); }
+
+.toast--warning { border-left-color: var(--warning-500); }
+.toast--warning .toast__icon { color: var(--warning-500); }
+
+.toast--info { border-left-color: var(--info-500); }
+.toast--info .toast__icon { color: var(--info-500); }
+
+@media (max-width: 480px) {
+  .toast-container {
+    left: var(--space-3);
+    right: var(--space-3);
+    max-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast { animation: none; }
+}
+
+/* ── KPI stat-card icon + inline icon+heading pattern ──
+   Replaces the old `style="font-size: 2rem"` emoji wrapper and the
+   "🏷️ Room Types" inline-emoji headings used across the admin/manager/staff
+   dashboards. */
+.stat__icon {
+  color: var(--color-primary);
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
+.icon-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* No forced icon colour here on purpose — the icon inherits `color` from
+   whatever text surrounds it (currentColor), same as the emoji it replaced
+   would have matched its own context. A card heading using this class still
+   reads teal because .card h3 itself is teal-ish text; a warning banner or
+   accent-coloured badge using the same class keeps ITS colour instead of
+   fighting a hardcoded override here. */

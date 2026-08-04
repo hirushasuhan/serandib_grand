@@ -1,0 +1,65 @@
+# ── Local configuration (contains DB credentials — NEVER commit) ──
+/config/config.php
+/config/database.php
+
+# Only the templates are tracked:
+!/config/config.sample.php
+
+# ── Runtime storage ──
+/storage/logs/*
+!/storage/logs/.gitkeep
+/storage/cache/*
+!/storage/cache/.gitkeep
+*.log
+
+# ── User uploads ──
+#
+# FIX: this used to blanket-ignore every file in uploads/rooms/, including
+# the 5 demo photos (standard_single.jpg, standard_double.jpg,
+# deluxe_double.jpg, family_suite.jpg, presidential_suite.jpg) that
+# database/seed.sql's room_types rows point at by that exact filename. A
+# teammate cloning the repo and running the seed got room type rows in the
+# database referencing images that didn't exist on their machine — broken
+# photos across the whole public site out of the box.
+#
+# Real admin uploads (the Uploader class names them with a random 32-char
+# hex string, e.g. 4c4074736213b3d860461090db7d9e50.jpg) are still excluded:
+# they're this developer's local test data, not part of the project.
+/uploads/rooms/*
+!/uploads/rooms/.gitkeep
+!/uploads/rooms/.htaccess
+!/uploads/rooms/standard_single.jpg
+!/uploads/rooms/standard_double.jpg
+!/uploads/rooms/deluxe_double.jpg
+!/uploads/rooms/family_suite.jpg
+!/uploads/rooms/presidential_suite.jpg
+!/uploads/.htaccess
+
+# ── Database dumps (schema.sql and seed.sql ARE tracked on purpose) ──
+*.sql.bak
+*.sql.gz
+/database/dump*.sql
+
+# ── Oversized source video ────────────────────────────────────────
+# GitHub rejects any single file over 100 MB. Only the compressed web
+# encodes (hero.mp4/hero.webm ~1-2 MB, login.mp4 ~1 MB) are tracked;
+# raw source footage (hero_drone.webm, resort_video.webm) must stay
+# out of the repository.
+/assets/vid/*
+!/assets/vid/hero.mp4
+!/assets/vid/hero.webm
+!/assets/vid/login.mp4
+!/assets/vid/.gitkeep
+
+# ── OS / editor noise ──
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*~
+
+# ── Dependency dirs (we use no package manager, but just in case) ──
+/vendor/
+/node_modules/

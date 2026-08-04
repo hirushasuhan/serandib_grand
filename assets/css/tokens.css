@@ -1,0 +1,143 @@
+/* ═══════════════════════════════════════════════════════════════
+   DESIGN TOKENS — Luxury Hotel Brand System & UI Enhancements
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  /* ── Brand Colors ── */
+  --brand-500: #0f766e;   /* Deep Emerald Teal */
+  --brand-600: #0d635c;
+  --brand-700: #0b524c;
+  --brand-400: #14958b;
+  --brand-100: #e0f2f1;
+  
+  --accent-500: #c8963e;  /* Hospitality Muted Gold */
+  --accent-400: #dfb668;
+  --accent-100: #f7ecd6;
+
+  /* ── Gradients ── */
+  --grad-primary: linear-gradient(135deg, #0f766e 0%, #0d635c 100%);
+  --grad-gold:    linear-gradient(135deg, #dfb668 0%, #c8963e 50%, #9a6f22 100%);
+  --grad-dark:    linear-gradient(135deg, #171b21 0%, #0e1116 100%);
+  --grad-hero:    linear-gradient(180deg, rgba(15, 118, 110, 0.45) 0%, rgba(14, 17, 22, 0.85) 100%);
+
+  /* ── Semantic Status Colors ── */
+  --success-500: #10b981;  --success-bg: #d1fae5;
+  --warning-500: #f59e0b;  --warning-bg: #fef3c7;
+  --danger-500:  #ef4444;  --danger-bg:  #fee2e2;
+  --info-500:    #3b82f6;  --info-bg:    #dbeafe;
+
+  /* ── Typography ── */
+  --font-sans:    'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-mono:    'JetBrains Mono', monospace;
+
+  --text-xs:   0.75rem;    /* 12px */
+  --text-sm:   0.875rem;   /* 14px */
+  --text-base: 1rem;       /* 16px */
+  --text-lg:   1.125rem;   /* 18px */
+  --text-xl:   1.375rem;   /* 22px */
+  --text-2xl:  1.75rem;    /* 28px */
+  --text-3xl:  2.25rem;    /* 36px */
+  --text-4xl:  3.25rem;    /* 52px */
+
+  --weight-normal: 400;  --weight-medium: 500;
+  --weight-semi:   600;  --weight-bold:   700;
+
+  --leading-tight: 1.18;  --leading-normal: 1.55;  --leading-loose: 1.75;
+  --tracking-tight: -0.02em;  --tracking-wide: 0.08em;
+
+  /* ── Spacing Scale ── */
+  --space-1: 0.25rem;  --space-2: 0.5rem;   --space-3: 0.75rem;
+  --space-4: 1rem;     --space-5: 1.25rem;  --space-6: 1.5rem;
+  --space-8: 2rem;     --space-10: 2.5rem;  --space-12: 3rem;
+  --space-16: 4rem;    --space-20: 5rem;    --space-24: 6rem;
+
+  /* ── Radii ── */
+  --radius-sm: 8px;   --radius-md: 12px;  --radius-lg: 20px;
+  --radius-xl: 28px;  --radius-full: 9999px;
+
+  /* ── Layout ── */
+  --container-max: 1240px;
+  --sidebar-w:     270px;
+  --header-h:      76px;
+
+  /* ── Motion & Transitions ── */
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast:  150ms;  --dur-base: 250ms;  --dur-slow: 400ms;
+
+  /* ── Z-Index ── */
+  --z-base: 1;   --z-sticky: 100;  --z-dropdown: 200;
+  --z-overlay: 300;  --z-modal: 400;  --z-toast: 500;
+
+  --focus-ring: 0 0 0 4px rgba(15, 118, 110, 0.25);
+}
+
+/* ═══════════════════ LIGHT THEME ═══════════════════ */
+:root,
+[data-theme='light'] {
+  --color-bg:            #f8fafc;
+  --color-surface:       #ffffff;
+  --color-surface-2:     #f1f5f9;
+  --color-surface-hover: #e2e8f0;
+  --color-border:        #e2e8f0;
+  --color-border-strong: #cbd5e1;
+
+  --color-text:          #0f172a;
+  --color-text-muted:    #475569;
+  --color-text-subtle:   #94a3b8;
+  --color-text-inverse:  #ffffff;
+
+  --color-primary:        var(--brand-500);
+  --color-primary-hover:  var(--brand-600);
+  --color-primary-soft:   var(--brand-100);
+  --color-on-primary:     #ffffff;
+  --color-accent:         var(--accent-500);
+
+  --shadow-xs: 0 1px 3px rgba(15, 23, 42, 0.06);
+  --shadow-sm: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 10px 20px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 20px 30px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.06);
+  --shadow-xl: 0 28px 50px -10px rgba(15, 23, 42, 0.18);
+
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --overlay: rgba(15, 23, 42, 0.55);
+  color-scheme: light;
+}
+
+/* ═══════════════════ DARK THEME ═══════════════════ */
+[data-theme='dark'] {
+  --color-bg:            #0b0f17;
+  --color-surface:       #131924;
+  --color-surface-2:     #1c2433;
+  --color-surface-hover: #263145;
+  --color-border:        #232d3f;
+  --color-border-strong: #334155;
+
+  --color-text:          #f1f5f9;
+  --color-text-muted:    #94a3b8;
+  --color-text-subtle:   #64748b;
+  --color-text-inverse:  #0b0f17;
+
+  --color-primary:        #2dd4bf;
+  --color-primary-hover:  #5eead4;
+  --color-primary-soft:   #113833;
+  --color-on-primary:     #042f2c;
+  --color-accent:         #f59e0b;
+
+  --success-500: #34d399;  --success-bg: #064e3b;
+  --warning-500: #fbbf24;  --warning-bg: #451a03;
+  --danger-500:  #f87171;  --danger-bg:  #451212;
+  --info-500:    #60a5fa;  --info-bg:    #1e3a8a;
+
+  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.40);
+  --shadow-sm: 0 4px 8px rgba(0, 0, 0, 0.50);
+  --shadow-md: 0 10px 24px rgba(0, 0, 0, 0.60);
+  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.70);
+  --shadow-xl: 0 30px 60px rgba(0, 0, 0, 0.85);
+
+  --glass-bg: rgba(19, 25, 36, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --overlay: rgba(0, 0, 0, 0.75);
+  color-scheme: dark;
+}

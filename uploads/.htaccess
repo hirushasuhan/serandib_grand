@@ -1,0 +1,30 @@
+# ═══════════════════════════════════════════════════════════════
+#  Upload directory — images may be SERVED, but nothing may be EXECUTED.
+#  This covers every subfolder, so a future upload path (e.g. uploads/avatars)
+#  inherits the protection automatically.
+# ═══════════════════════════════════════════════════════════════
+
+# Disable the PHP engine for everything under uploads/.
+# Wrapped in IfModule so the site does not 500 on a PHP-FPM setup where
+# mod_php is not loaded and php_flag would be an unknown directive.
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+
+# Belt and braces: refuse to serve anything executable even if the engine
+# directive above is ignored. This is what stops "shell.php.jpg" tricks and
+# any script smuggled past the MIME check in src/Core/Uploader.php.
+<FilesMatch "\.(php|phps|phtml|php3|php4|php5|php7|php8|phar|pl|py|cgi|asp|aspx|jsp|sh|bash|htaccess|htpasswd)$">
+    Require all denied
+</FilesMatch>
+
+# Only allow the image types the Uploader whitelists.
+<FilesMatch "\.(jpe?g|png|webp|gif|svg)$">
+    Require all granted
+</FilesMatch>
+
+Options -Indexes -ExecCGI
+AddType text/plain .php .phtml .phar

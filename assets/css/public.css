@@ -1,0 +1,1036 @@
+/* ═══════════════════════════════════════════════════════════════
+   PUBLIC SITE — 3D depth, parallax and scroll choreography
+   Loaded only on index / rooms / room-details / about / contact
+   (header.php includes it when $isPublicPage is true).
+
+   Every colour, space and duration below comes from tokens.css, so the
+   whole file works unchanged in both the light and dark theme.
+
+   ACCESSIBILITY: all transforms and animations are switched off wholesale
+   by the prefers-reduced-motion block at the very bottom of this file.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ───────────────────────────────────────────────────────────────
+   1. SHARED 3D FOUNDATION
+   A single shared perspective root keeps every tilt on the page
+   consistent. Without it each element invents its own vanishing
+   point and the effect looks chaotic.
+   ─────────────────────────────────────────────────────────────── */
+.scene-3d {
+  perspective: 1400px;
+  perspective-origin: 50% 40%;
+}
+
+.layer-3d {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* ───────────────────────────────────────────────────────────────
+   2. HERO — layered parallax with depth-of-field
+   Three stacked layers move at different rates on scroll (set by
+   public3d.js writing --parallax), producing real depth rather
+   than a flat background image.
+   ─────────────────────────────────────────────────────────────── */
+.hero3d {
+  position: relative;
+  min-height: clamp(560px, 88vh, 900px);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: var(--color-surface-2);
+}
+
+.hero3d__layer {
+  position: absolute;
+  inset: -8%;                       /* bleed, so parallax never exposes an edge */
+  z-index: -3;
+  background-size: cover;
+  background-position: center;
+  /* --parallax is updated from JS on scroll; the fallback keeps it static. */
+  transform: translate3d(0, var(--parallax, 0px), 0) scale(1.08);
+  will-change: transform;
+}
+
+.hero3d__layer--mid {
+  z-index: -2;
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(200, 150, 62, 0.22) 0%,
+    transparent 55%
+  );
+}
+
+/* ── Drone video background ──
+   The still image is a CSS background on the WRAPPER, not just the video's
+   `poster`. That means the hero is fully painted on first render, with no
+   dependency on the video loading at all — and if the video is skipped
+   (reduced motion, slow connection, small screen, missing file) the page still
+   looks finished. See initHeroVideo() in public3d.js.
+
+   These rules live here rather than in a style attribute so the
+   prefers-reduced-motion block at the bottom of this file can override them.
+   An inline style cannot be overridden by a media query. */
+.hero3d__video-wrapper {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  overflow: hidden;
+  background-color: var(--color-surface-2);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  transform: translate3d(0, var(--parallax, 0px), 0);
+  will-change: transform;
+}
+
+.hero3d__video-wrapper video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  /* Slight scale stops the parallax drift exposing an edge. */
+  transform: scale(1.06);
+  filter: brightness(0.85) contrast(1.08);
+  /* Hidden until the first frame actually plays, otherwise the element paints
+     as a black rectangle on top of the poster while it buffers. */
+  opacity: 0;
+  transition: opacity 900ms var(--ease-out);
+}
+
+.hero3d__video-wrapper video.is-ready {
+  opacity: 1;
+}
+
+/* Gradient scrim: guarantees text contrast over ANY photo, which a
+   plain semi-transparent overlay cannot do reliably. */
+.hero3d__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgba(9, 12, 18, 0.30) 0%, rgba(9, 12, 18, 0.72) 55%, rgba(9, 12, 18, 0.92) 100%),
+    linear-gradient(115deg, rgba(15, 118, 110, 0.42) 0%, transparent 60%);
+}
+
+.hero3d__inner {
+  position: relative;
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding: var(--space-20) var(--space-4) var(--space-16);
+  text-align: center;
+  color: #fff;
+}
+
+.hero3d__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 7px 18px;
+  margin-bottom: var(--space-5);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: #ffe9bd;
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 233, 189, 0.38);
+  border-radius: var(--radius-full);
+  backdrop-filter: blur(10px);
+}
+
+.hero3d__title {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 6.2vw, 4.6rem);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  margin: 0 0 var(--space-5);
+  color: #fff;
+  text-shadow: 0 4px 30px rgba(0, 0, 0, 0.45);
+}
+
+/* Base state is a plain gold word — safe everywhere. The gradient is layered on
+   only where background-clip:text actually works, so an unsupporting engine
+   shows gold text instead of an invisible headline. Nested @supports is avoided
+   deliberately: CSS nesting is too new to rely on here. */
+.hero3d__title em {
+  font-style: normal;
+  color: #dfb668;
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .hero3d__title em {
+    background: var(--grad-gold);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+.hero3d__lead {
+  max-width: 62ch;
+  margin: 0 auto var(--space-8);
+  font-size: clamp(var(--text-base), 2vw, var(--text-lg));
+  line-height: var(--leading-loose);
+  color: rgba(255, 255, 255, 0.88);
+}
+
+/* Word-by-word entrance. Delay is set inline per word by the PHP loop. */
+.word-rise {
+  display: inline-block;
+  opacity: 0;
+  transform: translate3d(0, 0.5em, -60px) rotateX(-35deg);
+  animation: wordRise 0.85s var(--ease-out) forwards;
+}
+
+@keyframes wordRise {
+  to { opacity: 1; transform: translate3d(0, 0, 0) rotateX(0); }
+}
+
+/* ── Floating glass search panel ──
+   The glass effect is kept, but the panel now sits on a DARK translucent base
+   instead of a white one.
+
+   THE PROBLEM THIS FIXES: `rgba(255,255,255,0.12)` is a white veil, and the
+   labels and input text on top of it are also white. Over a bright frame of
+   the video the whole panel washed out and the text became unreadable — the
+   "blurry" look. A dark base keeps the frosted-glass feel while guaranteeing
+   white text always has something dark to sit against, whatever the video is
+   showing behind it at that moment. */
+.hero3d__search {
+  position: relative;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    180deg,
+    rgba(10, 15, 23, 0.62) 0%,
+    rgba(10, 15, 23, 0.72) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(14px) saturate(125%);
+  -webkit-backdrop-filter: blur(14px) saturate(125%);
+  box-shadow:
+    0 28px 60px -16px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  transform: translateZ(40px);
+  text-align: start;
+}
+
+/* Browsers without backdrop-filter (older Firefox, some Android WebViews) get
+   no blur at all — without this the panel would be near-transparent there. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .hero3d__search {
+    background: rgba(10, 15, 23, 0.88);
+  }
+}
+
+.hero3d__search-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-4);
+  align-items: end;
+}
+
+.hero3d__search label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  /* Was 0.82 alpha — too faint against a moving background. */
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Inputs inside the glass panel need their own colours — the default
+   .form-control is tuned for a solid surface, not a translucent one.
+   Darkened from rgba(255,255,255,0.16) for the same contrast reason as the
+   panel itself: white text needs a dark field, not a lighter one. */
+.hero3d__search .form-control,
+.hero3d__search .form-select {
+  background: rgba(0, 0, 0, 0.34);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  color: #fff;
+}
+
+.hero3d__search .form-control::placeholder { color: rgba(255, 255, 255, 0.72); }
+
+.hero3d__search .form-control:focus,
+.hero3d__search .form-select:focus {
+  background: rgba(0, 0, 0, 0.46);
+  border-color: var(--accent-400);
+  box-shadow: 0 0 0 4px rgba(223, 182, 104, 0.28);
+  outline: none;
+}
+
+/* The native date/time picker icon is black by default and vanishes
+   against the translucent panel. */
+.hero3d__search input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(1.6);
+  cursor: pointer;
+}
+
+/**
+ * The hero panel sits on video, so its CONTROLS are deliberately light-on-glass
+ * in both themes. The popup LIST, however, is drawn by the OS outside the
+ * panel — it must follow the active theme like every other dropdown.
+ *
+ * FIX: these were hardcoded to `color: #16191c; background: #fff`, which meant
+ * the home-page dropdowns stayed white-with-black-text even in dark mode while
+ * every other select on the site turned dark.
+ */
+.hero3d__search .form-select option {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+/* ── Scroll cue ── */
+.hero3d__cue {
+  position: absolute;
+  bottom: var(--space-6);
+  left: 50%;
+  translate: -50% 0;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.hero3d__cue span {
+  width: 1px;
+  height: 42px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.8), transparent);
+  animation: cueDrop 2s var(--ease-in-out, ease) infinite;
+}
+
+@keyframes cueDrop {
+  0%, 100% { opacity: 0.25; transform: scaleY(0.55); transform-origin: top; }
+  50%      { opacity: 1;    transform: scaleY(1);    transform-origin: top; }
+}
+
+/* ───────────────────────────────────────────────────────────────
+   3. TILT CARDS — the main 3D interaction
+   JS supplies --rx / --ry (rotation) and --mx / --my (glare position).
+   The CSS owns all the visual work so the JS stays a thin input layer.
+   ─────────────────────────────────────────────────────────────── */
+.tilt {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform var(--dur-base) var(--ease-out),
+              box-shadow var(--dur-base) var(--ease-out);
+  transform:
+    perspective(900px)
+    rotateX(var(--rx, 0deg))
+    rotateY(var(--ry, 0deg))
+    translateZ(0);
+}
+
+.tilt:hover,
+.tilt:focus-within {
+  box-shadow: var(--shadow-xl);
+  z-index: 2;
+}
+
+/* Children lift out of the card face at different depths. */
+.tilt__depth-1 { transform: translateZ(18px); }
+.tilt__depth-2 { transform: translateZ(38px); }
+.tilt__depth-3 { transform: translateZ(60px); }
+
+/* Specular highlight that tracks the cursor. pointer-events:none is
+   essential or it would swallow clicks meant for the card. */
+.tilt__glare {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-out);
+  background: radial-gradient(
+    380px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 255, 255, 0.20),
+    transparent 60%
+  );
+  mix-blend-mode: soft-light;
+}
+
+.tilt:hover .tilt__glare,
+.tilt:focus-within .tilt__glare { opacity: 1; }
+
+[data-theme='dark'] .tilt__glare {
+  background: radial-gradient(
+    380px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(45, 212, 191, 0.16),
+    transparent 62%
+  );
+}
+
+/* ───────────────────────────────────────────────────────────────
+   4. ROOM CARD
+   ─────────────────────────────────────────────────────────────── */
+.room-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.room-card__media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--color-surface-2);
+}
+
+.room-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+
+/* Scale from CSS on hover — the old markup used inline onmouseover
+   handlers, which the Content-Security-Policy now blocks. */
+.room-card:hover .room-card__media img,
+.room-card:focus-within .room-card__media img {
+  transform: scale(1.07);
+}
+
+.room-card__media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 45%, rgba(9, 12, 18, 0.55) 100%);
+}
+
+.room-card__badges {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+.room-card__price-tag {
+  position: absolute;
+  bottom: var(--space-3);
+  left: var(--space-3);
+  z-index: 2;
+  padding: 8px 14px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(12px);
+  color: #fff;
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+  white-space: nowrap;
+}
+
+.room-card__price-tag small {
+  font-weight: var(--weight-normal);
+  opacity: 0.8;
+}
+
+.room-card__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: var(--space-3);
+  padding: var(--space-5);
+}
+
+.room-card__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.room-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.room-card__meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.room-card__desc {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--color-text-muted);
+  /* Clamp to 3 lines so cards in a row stay the same height regardless
+     of how long an admin made the description. */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.room-card__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: auto;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+/* ───────────────────────────────────────────────────────────────
+   5. AMENITY / FACILITY TILES
+   ─────────────────────────────────────────────────────────────── */
+.facility {
+  position: relative;
+  padding: var(--space-6);
+  text-align: center;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  transition: transform var(--dur-base) var(--ease-out),
+              box-shadow var(--dur-base) var(--ease-out),
+              border-color var(--dur-base) var(--ease-out);
+}
+
+.facility:hover {
+  transform: translateY(-6px) rotateX(4deg);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-primary);
+}
+
+.facility__icon {
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  margin: 0 auto var(--space-4);
+  font-size: 26px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  transform: translateZ(20px);
+  transition: transform var(--dur-base) var(--ease-spring);
+}
+
+.facility:hover .facility__icon { transform: translateZ(20px) scale(1.12) rotate(-6deg); }
+
+.facility h3 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-lg);
+  color: var(--color-text);
+}
+
+.facility p {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--color-text-muted);
+}
+
+/* ───────────────────────────────────────────────────────────────
+   6. SECTION HEADINGS
+   ─────────────────────────────────────────────────────────────── */
+.section {
+  padding-block: clamp(var(--space-12), 9vw, var(--space-24));
+}
+
+.section--tinted { background: var(--color-surface-2); }
+
+.section__head {
+  max-width: 720px;
+  margin: 0 auto var(--space-12);
+  text-align: center;
+}
+
+.section__eyebrow {
+  display: block;
+  margin-bottom: var(--space-3);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.section__title {
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 4vw, var(--text-3xl));
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  color: var(--color-text);
+}
+
+.section__lead {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: var(--leading-loose);
+  color: var(--color-text-muted);
+}
+
+/* ───────────────────────────────────────────────────────────────
+   7. ANIMATED STAT COUNTERS
+   ─────────────────────────────────────────────────────────────── */
+.counter-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: var(--space-4);
+  padding: var(--space-8);
+  border-radius: var(--radius-lg);
+  background: var(--grad-primary);
+  box-shadow: var(--shadow-lg);
+}
+
+.counter {
+  text-align: center;
+  color: #fff;
+  transform: translateZ(0);
+}
+
+.counter__value {
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 4vw, 2.8rem);
+  font-weight: 700;
+  line-height: 1;
+  /* Tabular figures stop the number jittering while it counts up. */
+  font-variant-numeric: tabular-nums;
+}
+
+.counter__label {
+  margin-top: 6px;
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ───────────────────────────────────────────────────────────────
+   8. SCROLL REVEAL
+   Elements start shifted and rotated in Z, then settle. The
+   .is-revealed class is added by the IntersectionObserver.
+   ─────────────────────────────────────────────────────────────── */
+[data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 34px, -40px) rotateX(-6deg);
+  transition:
+    opacity 0.7s var(--ease-out),
+    transform 0.7s var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+[data-reveal].is-revealed {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) rotateX(0);
+}
+
+/* FAILSAFE: if JavaScript never runs, nothing must stay invisible. */
+.no-js [data-reveal] {
+  opacity: 1;
+  transform: none;
+}
+
+/* ───────────────────────────────────────────────────────────────
+   9. ROOM DETAIL PAGE — content + sticky booking rail
+   Replaces the `grid--sidebar` class that pages referenced but which
+   was never defined in layout.css, so the widget stacked underneath.
+   ─────────────────────────────────────────────────────────────── */
+.detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: var(--space-8);
+  align-items: start;
+}
+
+.detail-rail {
+  position: sticky;
+  top: calc(var(--header-h) + var(--space-4));
+}
+
+@media (max-width: 1024px) {
+  .detail-layout { grid-template-columns: 1fr; }
+  .detail-rail   { position: static; }
+}
+
+/* ── 3D gallery ── */
+.gallery3d {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--color-surface-2);
+  box-shadow: var(--shadow-md);
+}
+
+.gallery3d__stage {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+}
+
+.gallery3d__slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: scale(1.06);
+  transition: opacity var(--dur-slow) var(--ease-out),
+              transform var(--dur-slow) var(--ease-out);
+}
+
+.gallery3d__slide.is-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.gallery3d__slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.gallery3d__thumbs {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.gallery3d__thumb {
+  flex: 0 0 84px;
+  height: 60px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  cursor: pointer;
+  background: none;
+  opacity: 0.6;
+  transition: opacity var(--dur-fast), border-color var(--dur-fast), transform var(--dur-fast);
+}
+
+.gallery3d__thumb img { width: 100%; height: 100%; object-fit: cover; }
+.gallery3d__thumb:hover { opacity: 1; transform: translateY(-2px); }
+
+.gallery3d__thumb[aria-selected='true'] {
+  opacity: 1;
+  border-color: var(--color-primary);
+}
+
+/* ── Price breakdown rows ── */
+.quote-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-block: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.quote-row--total {
+  margin-top: var(--space-2);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border-strong);
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
+  color: var(--color-primary);
+}
+
+.quote-row__value { font-variant-numeric: tabular-nums; color: var(--color-text); }
+.quote-row--total .quote-row__value { color: var(--color-primary); }
+
+/* ───────────────────────────────────────────────────────────────
+   10. FILTER BAR (rooms page)
+   ─────────────────────────────────────────────────────────────── */
+.filter-bar {
+  padding: var(--space-5);
+  margin-bottom: var(--space-8);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.filter-bar__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+  gap: var(--space-4);
+  align-items: end;
+}
+
+/* ───────────────────────────────────────────────────────────────
+   11. TESTIMONIALS
+   ─────────────────────────────────────────────────────────────── */
+.quote-card {
+  position: relative;
+  height: 100%;
+  padding: var(--space-6);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.quote-card::before {
+  content: '\201C';
+  position: absolute;
+  top: -6px;
+  left: var(--space-4);
+  font-family: var(--font-display);
+  font-size: 5rem;
+  line-height: 1;
+  color: var(--color-accent);
+  opacity: 0.28;
+}
+
+.quote-card__text {
+  position: relative;
+  margin: 0 0 var(--space-5);
+  font-size: var(--text-sm);
+  line-height: var(--leading-loose);
+  color: var(--color-text);
+}
+
+.quote-card__who {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.quote-card__avatar {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  background: var(--grad-primary);
+  color: #fff;
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+}
+
+/* ───────────────────────────────────────────────────────────────
+   12. CTA BAND
+   ─────────────────────────────────────────────────────────────── */
+.cta-band {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(var(--space-12), 8vw, var(--space-20)) var(--space-6);
+  text-align: center;
+  border-radius: var(--radius-xl);
+  background: var(--grad-dark);
+  box-shadow: var(--shadow-xl);
+  color: #fff;
+}
+
+.cta-band::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(15, 118, 110, 0.55), transparent 45%),
+    radial-gradient(circle at 85% 80%, rgba(200, 150, 62, 0.35), transparent 45%);
+}
+
+.cta-band > * { position: relative; }
+
+.cta-band h2 {
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 4.5vw, 2.75rem);
+  color: #fff;
+}
+
+.cta-band p {
+  max-width: 56ch;
+  margin: 0 auto var(--space-8);
+  color: rgba(255, 255, 255, 0.82);
+  line-height: var(--leading-loose);
+}
+
+/* ───────────────────────────────────────────────────────────────
+   13. STICKY MOBILE BOOKING BAR (room details)
+   ─────────────────────────────────────────────────────────────── */
+.mobile-book-bar {
+  display: none;
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: var(--z-sticky);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background: var(--glass-bg);
+  border-top: 1px solid var(--color-border);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.18);
+  /* Clears the iOS home indicator. */
+  padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+}
+
+@media (max-width: 1024px) {
+  .mobile-book-bar { display: flex; }
+  /* Stop the bar covering the footer's last line. */
+  body.is-public .footer { padding-bottom: 96px; }
+}
+
+/* ───────────────────────────────────────────────────────────────
+   14. EMPTY STATE
+   ─────────────────────────────────────────────────────────────── */
+.empty-state {
+  padding: clamp(var(--space-10), 8vw, var(--space-20)) var(--space-6);
+  text-align: center;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border-strong);
+}
+
+.empty-state__icon {
+  font-size: 3rem;
+  margin-bottom: var(--space-4);
+  opacity: 0.75;
+}
+
+/* ───────────────────────────────────────────────────────────────
+   15. SKIP LINK — intentionally NOT defined here.
+
+   This file loads AFTER base.css, so a copy of `.skip-link` here overrode
+   the canonical rule. This one only reset `left`, leaving `top` unset, which
+   made the link fall back into view on some layouts.
+
+   The single source of truth is now `assets/css/base.css`, which loads on
+   EVERY page (public and dashboard). Do not re-add it here.
+   ─────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────
+   16. RESPONSIVE
+   ─────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .hero3d { min-height: 78vh; }
+  .hero3d__inner { padding-block: var(--space-16) var(--space-12); }
+  .hero3d__search { transform: none; padding: var(--space-4); }
+  .counter-strip { padding: var(--space-5); }
+
+  /* Tilt is a pointer affordance; on touch it just makes cards feel broken. */
+  .tilt { transform: none !important; }
+  .tilt__glare { display: none; }
+
+  /* The 3D scene adds nothing on a phone and costs compositing work. */
+  .scene-3d, .layer-3d { transform: none !important; perspective: none; }
+
+  /* One field per row: two 160px columns plus a gap overflow a 360px screen. */
+  .hero3d__search-grid { grid-template-columns: 1fr; }
+
+  /* The submit button is the last grid child and should span full width. */
+  .hero3d__search .btn { width: 100%; }
+
+  .section { padding-block: var(--space-12); }
+  .section__head { margin-bottom: var(--space-8); }
+
+  .gallery3d__stage { aspect-ratio: 4 / 3; }
+
+  .cta-band { padding: var(--space-10) var(--space-5); }
+
+  .quote-card, .facility { padding: var(--space-5); }
+
+  /* Sticky bar overlaps the last section otherwise. */
+  body.is-public main { padding-bottom: var(--space-6); }
+}
+
+@media (max-width: 480px) {
+  .hero3d { min-height: 70vh; }
+  .hero3d__inner { padding-block: var(--space-12) var(--space-10); }
+  .hero3d__eyebrow { font-size: 10px; }
+  .counter-strip { grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
+  .filter-bar { padding: var(--space-4); }
+  .filter-bar__grid { grid-template-columns: 1fr; }
+  .mobile-book-bar { padding-inline: var(--space-3); }
+}
+
+/* Devices without a precise pointer get no tilt at all. */
+@media (hover: none) {
+  .tilt { transform: none !important; }
+  .tilt__glare { display: none; }
+}
+
+/* ───────────────────────────────────────────────────────────────
+   17. REDUCED MOTION — overrides everything above.
+   Users who ask for less motion get the full layout with no
+   transforms, parallax or animation.
+   ─────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .hero3d__layer { transform: none !important; }
+  .hero3d__video-wrapper { transform: none !important; }
+
+  /* An autoplaying looping video is exactly what this preference asks us not
+     to do. public3d.js pauses playback; this hides the frame drift and falls
+     back to the poster image so the hero still looks intentional. */
+  .hero3d__video-wrapper video {
+    transform: none !important;
+    filter: brightness(0.85) contrast(1.08);
+  }
+  .word-rise     { animation: none !important; opacity: 1 !important; transform: none !important; }
+  .hero3d__cue span { animation: none !important; }
+
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .tilt,
+  .tilt__depth-1,
+  .tilt__depth-2,
+  .tilt__depth-3,
+  .facility:hover,
+  .facility__icon,
+  .room-card:hover .room-card__media img {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .tilt__glare { display: none !important; }
+}
+
+/* ───────────────────────────────────────────────────────────────
+   18. PRINT — strip the decoration
+   ─────────────────────────────────────────────────────────────── */
+@media print {
+  .hero3d__cue,
+  .mobile-book-bar,
+  .tilt__glare,
+  #site-preloader,
+  #top-progress-bar { display: none !important; }
+
+  .hero3d { min-height: auto; }
+  [data-reveal] { opacity: 1 !important; transform: none !important; }
+}

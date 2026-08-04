@@ -1,0 +1,6 @@
+# Form handlers MUST stay reachable — every <form action> points in here.
+# They are not protected by Apache; each one protects itself in PHP with
+# Csrf::verify() + Auth::requireRole() as its first two statements.
+<IfModule mod_authz_core.c>
+    Require all granted
+</IfModule>
