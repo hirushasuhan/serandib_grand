@@ -4,7 +4,7 @@ declare(strict_types=1);
 // ── Environment ──────────────────────────────────────────────
 define('APP_ENV',  'development');   // 'development' | 'production'
 define('APP_NAME', 'Serendib Grand Hotel');
-define('BASE_URL', 'http://localhost/Hotel%20Reservation%20System');
+define('BASE_URL', 'http://localhost/serandib_grand');
 
 // ── Paths ────────────────────────────────────────────────────
 define('BASE_PATH',    dirname(__DIR__));
