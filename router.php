@@ -21,13 +21,16 @@ if (str_contains($uriPath, '..')) {
 
 // Block access to sensitive directories, hidden files, and internal file types
 $blockedDirectories = ['config', 'src', 'storage', 'database', 'docs', 'includes'];
-$blockedExtensions = ['sql', 'log', 'md', 'ini', 'sample', 'bak', 'old', 'dist', 'yml', 'yaml', 'toml', 'docx', 'lock'];
+$blockedExtensions = ['sql', 'log', 'md', 'ini', 'sample', 'bak', 'old', 'dist', 'yml', 'yaml', 'toml', 'docx', 'lock', 'txt', 'env', 'sh', 'bat'];
 
 $patternDirs = '#^/(' . implode('|', $blockedDirectories) . ')(/|$)#i';
 $patternExts = '#\.(' . implode('|', $blockedExtensions) . ')$#i';
 $isDotFile = preg_match('#(^|/)\.#', $uriPath);
 
-if ($isDotFile || preg_match($patternDirs, $uriPath) || preg_match($patternExts, $uriPath)) {
+// Disallow PHP file execution inside /uploads/
+$isUploadsPhp = str_starts_with(strtolower($uriPath), '/uploads/') && str_ends_with(strtolower($uriPath), '.php');
+
+if ($isDotFile || $isUploadsPhp || preg_match($patternDirs, $uriPath) || preg_match($patternExts, $uriPath)) {
     http_response_code(403);
     if (file_exists(__DIR__ . '/403.php')) {
         require __DIR__ . '/403.php';

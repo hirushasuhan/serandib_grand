@@ -17,8 +17,9 @@ require __DIR__ . '/includes/nav.php';
     <p class="text-muted" style="max-width: 500px; margin-inline: auto; margin-bottom: var(--space-6);">
       An unexpected internal system error occurred. The incident has been logged for technical investigation.
     </p>
-    <?php if (!empty($GLOBALS['last_error'])): ?>
+    <?php if (defined('APP_ENV') && APP_ENV !== 'production' && !empty($GLOBALS['last_error'])): ?>
       <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #dc2626; padding: 12px 16px; border-radius: 6px; text-align: left; max-width: 700px; margin: 0 auto var(--space-6); font-family: monospace; font-size: 13px; word-break: break-all;">
+        <strong>[Development Debug Trace]</strong><br>
         <?= e($GLOBALS['last_error']) ?>
       </div>
     <?php endif; ?>

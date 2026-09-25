@@ -69,4 +69,7 @@ desktop.ini
 .env
 .env.*
 !.env.example
+app.yaml
+!app.sample.yaml
+login.txt
 

@@ -95,7 +95,7 @@ require __DIR__ . '/../includes/nav.php';
   </div>
 </main>
 
-<script>
+<script nonce="<?= e(CSP_NONCE) ?>">
 document.addEventListener('DOMContentLoaded', () => {
   const vid = document.getElementById('resort-bg-video');
   if (vid) {

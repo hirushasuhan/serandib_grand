@@ -1,4 +1,0 @@
-Admin: admin@hotel.test / Admin@1234
-Manager: manager@hotel.test / Manager@1234
-Receptionist: reception@hotel.test / Reception@1234
-Guest: guest@hotel.test / Guest@1234

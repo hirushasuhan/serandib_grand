@@ -200,7 +200,7 @@ require __DIR__ . '/../includes/header.php';
   </div>
 </div>
 
-<script>
+<script nonce="<?= e(CSP_NONCE) ?>">
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.tab-link').forEach(link => {
     link.addEventListener('click', (e) => {

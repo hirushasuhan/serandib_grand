@@ -7,22 +7,32 @@ use App\Core\Csrf;
 use App\Core\Validator;
 use App\Models\User;
 use App\Core\Database;
+use App\Core\Flash;
+use App\Core\Logger;
+use App\Core\AuditLog;
+use App\Core\RateLimiter;
 
-$resetLink = '';
+$submitted = false;
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     Csrf::verify();
-    
+
+    $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+    if (RateLimiter::tooManyRegistrations($ip)) {
+        Flash::error('Too many password reset requests from this connection. Please try again later.');
+        redirect('auth/forgot-password.php');
+    }
+
     $v = Validator::make($_POST, ['email' => 'required|email']);
     if ($v->fails()) {
         $errors = $v->errors();
     } else {
         $email = strtolower(trim($_POST['email']));
         $user = User::findByEmail($email);
-        
-        if ($user) {
-            $token = bin2hex(random_bytes(24));
+
+        if ($user && $user->status === 'active') {
+            $token = bin2hex(random_bytes(32));
             $tokenHash = hash('sha256', $token);
             $expiresAt = date('Y-m-d H:i:s', time() + RESET_TOKEN_TTL);
 
@@ -31,10 +41,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 [':e' => $email, ':t' => $tokenHash, ':ex' => $expiresAt]
             );
 
-            $resetLink = url("auth/reset-password.php?token={$token}&email=" . urlencode($email));
-        } else {
-            $resetLink = 'demo_mode_no_account';
+            $resetUrl = url("auth/reset-password.php?token={$token}&email=" . urlencode($email));
+            
+            // In development, log the reset URL to the secure app log for testing.
+            // Under NO circumstance is the link rendered to the end-user HTML page.
+            if (!defined('APP_ENV') || APP_ENV !== 'production') {
+                Logger::info("Development Password Reset Link for {$email}: {$resetUrl}");
+            }
+
+            AuditLog::record('auth.reset_requested', 'users', (int) $user->id, "Reset requested for {$email}");
         }
+
+        // Anti-enumeration delay so execution time is indistinguishable
+        usleep(random_int(120000, 250000));
+        $submitted = true;
     }
 }
 
@@ -49,31 +69,30 @@ require __DIR__ . '/../includes/nav.php';
     
     <div class="card" style="padding: var(--space-8);">
       <h1 style="font-size: var(--text-xl); font-weight: var(--weight-bold); margin-bottom: var(--space-2);">Reset Your Password</h1>
-      <p class="text-muted" style="font-size: var(--text-sm); margin-bottom: var(--space-6);">Enter your registered account email to generate a single-use reset token link.</p>
+      <p class="text-muted" style="font-size: var(--text-sm); margin-bottom: var(--space-6);">Enter your registered account email to receive password recovery instructions.</p>
 
-      <?php if ($resetLink): ?>
-        <?php if ($resetLink === 'demo_mode_no_account'): ?>
-          <div class="card mb-6" style="background-color: var(--danger-bg); border-color: var(--danger-500); font-size: var(--text-sm);">
-            If an account exists with that email, a password reset link has been generated. (Note: No account found for this demo email).
-          </div>
-        <?php else: ?>
-          <div class="card mb-6" style="background-color: var(--success-bg); border-color: var(--success-500); font-size: var(--text-sm);">
-            <strong>Demo Password Reset Link Generated:</strong><br>
-            <p style="margin-top: 8px; word-break: break-all;"><a href="<?= e($resetLink) ?>" style="font-weight: bold; text-decoration: underline;"><?= e($resetLink) ?></a></p>
-            <span style="font-size: var(--text-xs); color: var(--color-text-muted);">(Valid for 30 minutes, single-use only)</span>
-          </div>
-        <?php endif; ?>
+      <?php if ($submitted): ?>
+        <div class="card mb-6" style="background-color: var(--success-bg); border-color: var(--success-500); font-size: var(--text-sm);">
+          <strong>Instructions Dispatched:</strong><br>
+          If an account exists with that email address, password reset instructions have been generated.
+          <?php if (!defined('APP_ENV') || APP_ENV !== 'production'): ?>
+            <p style="margin-top: 8px; font-size: var(--text-xs); color: var(--color-text-subtle);">
+              (Development Note: Check <code>storage/logs/app.log</code> to view the generated link).
+            </p>
+          <?php endif; ?>
+        </div>
       <?php endif; ?>
 
       <form method="post" action="<?= url('auth/forgot-password.php') ?>">
         <?= Csrf::field() ?>
         
         <div class="form-group">
-          <label class="form-label">Email Address</label>
-          <input type="email" name="email" class="form-control" placeholder="guest@hotel.test" required>
+          <label class="form-label" for="reset-email">Email Address</label>
+          <input type="email" id="reset-email" name="email" class="form-control" placeholder="guest@hotel.test" autocomplete="email" required>
+          <?php if (isset($errors['email'])): ?><div class="form-error"><?= e($errors['email']) ?></div><?php endif; ?>
         </div>
 
-        <button type="submit" class="btn btn--primary btn--block">Generate Reset Link &rarr;</button>
+        <button type="submit" class="btn btn--primary btn--block">Send Reset Link &rarr;</button>
       </form>
 
       <div style="text-align: center; margin-top: var(--space-6);">

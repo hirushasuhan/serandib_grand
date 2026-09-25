@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     Csrf::verify();
 
     $v = Validator::make($_POST, [
-        'password'         => 'required|min:8|confirmed',
+        'password'         => 'required|password|confirmed',
         'password_confirm' => 'required'
     ]);
 
@@ -37,7 +37,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $user = User::findByEmail($email);
             if ($user) {
                 $user->update(['password_hash' => User::hashPassword($_POST['password'])]);
-                $db->query("UPDATE password_resets SET used_at = NOW() WHERE id = :id", [':id' => $reset['id']]);
+                // Invalidate all tokens for this email
+                $db->query("UPDATE password_resets SET used_at = NOW() WHERE email = :e", [':e' => $email]);
+
+                \App\Core\AuditLog::record('auth.password_reset', 'users', (int) $user->id, "Password reset via token");
 
                 Flash::success("Password reset successfully! You can now log in with your new password.");
                 redirect('auth/login.php');

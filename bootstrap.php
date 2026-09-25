@@ -58,6 +58,25 @@ set_exception_handler(function (Throwable $e): void {
 if (!headers_sent()) {
     define('CSP_NONCE', base64_encode(random_bytes(16)));
 
+    // Universal HTTP Security Headers (active on Wasmer Edge, Apache, Nginx)
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: SAMEORIGIN');
+    header('Referrer-Policy: strict-origin-when-cross-origin');
+    header('Permissions-Policy: geolocation=(), microphone=(), camera=()');
+    header('Cross-Origin-Opener-Policy: same-origin');
+
+    // Enforce HSTS when serving over HTTPS or behind Wasmer edge SSL proxy
+    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+    if ($isHttps) {
+        header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
+    }
+
+    // Strip sensitive runtime headers
+    if (function_exists('header_remove')) {
+        header_remove('X-Powered-By');
+    }
+
     header("Content-Security-Policy: "
         . "default-src 'self'; "
         . "script-src 'self' 'nonce-" . CSP_NONCE . "'; "

@@ -98,6 +98,7 @@ final class ReportService
 
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('X-Content-Type-Options: nosniff');
 
         $output = fopen('php://output', 'w');
         
@@ -107,7 +108,18 @@ final class ReportService
 
         foreach ($reportableItems as $item) {
             if ($item instanceof Reportable) {
-                fputcsv($output, $item->toReportRow());
+                $row = $item->toReportRow();
+                // Sanitize potential CSV/Formula Injection triggers (CWE-1236)
+                $sanitizedRow = array_map(static function ($val) {
+                    if (is_string($val) && strlen($val) > 0) {
+                        $firstChar = $val[0];
+                        if (in_array($firstChar, ['=', '+', '-', '@', "\t", "\r", '%'], true)) {
+                            return "'" . $val;
+                        }
+                    }
+                    return $val;
+                }, $row);
+                fputcsv($output, $sanitizedRow);
             }
         }
 

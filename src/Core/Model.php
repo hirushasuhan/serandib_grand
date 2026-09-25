@@ -38,13 +38,22 @@ abstract class Model
         return $row ? new static($row) : null;
     }
 
+    protected static function safeIdentifier(string $identifier): string
+    {
+        if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $identifier)) {
+            throw new \InvalidArgumentException("Invalid column identifier: '{$identifier}'");
+        }
+        return "`{$identifier}`";
+    }
+
     public static function all(array $order = []): array
     {
         $sql = "SELECT * FROM " . static::$table;
         if (!empty($order)) {
-            $col = array_key_first($order);
+            $col = (string) array_key_first($order);
+            $safeCol = self::safeIdentifier($col);
             $dir = strtoupper($order[$col]) === 'DESC' ? 'DESC' : 'ASC';
-            $sql .= " ORDER BY {$col} {$dir}";
+            $sql .= " ORDER BY {$safeCol} {$dir}";
         }
         $rows = Database::getInstance()->query($sql)->fetchAll();
         return array_map(fn($row) => new static($row), $rows);
@@ -55,15 +64,19 @@ abstract class Model
         $whereClause = [];
         $params = [];
         foreach ($conditions as $col => $val) {
-            $whereClause[] = "{$col} = :{$col}";
-            $params[":{$col}"] = $val;
+            $colStr = (string)$col;
+            $safeCol = self::safeIdentifier($colStr);
+            $paramName = preg_replace('/[^a-zA-Z0-9_]/', '', $colStr);
+            $whereClause[] = "{$safeCol} = :{$paramName}";
+            $params[":{$paramName}"] = $val;
         }
 
         $sql = "SELECT * FROM " . static::$table . " WHERE " . implode(' AND ', $whereClause);
         if (!empty($order)) {
-            $col = array_key_first($order);
+            $col = (string) array_key_first($order);
+            $safeCol = self::safeIdentifier($col);
             $dir = strtoupper($order[$col]) === 'DESC' ? 'DESC' : 'ASC';
-            $sql .= " ORDER BY {$col} {$dir}";
+            $sql .= " ORDER BY {$safeCol} {$dir}";
         }
 
         $rows = Database::getInstance()->query($sql, $params)->fetchAll();
@@ -83,7 +96,7 @@ abstract class Model
             $filtered = $data;
         }
 
-        $columns = implode(', ', array_keys($filtered));
+        $columns = implode(', ', array_map([self::class, 'safeIdentifier'], array_keys($filtered)));
         $placeholders = ':' . implode(', :', array_keys($filtered));
 
         $sql = "INSERT INTO " . static::$table . " ({$columns}) VALUES ({$placeholders})";
@@ -118,7 +131,8 @@ abstract class Model
         $setClause = [];
         $params = [':id' => $this->attributes[static::$primaryKey]];
         foreach ($filtered as $key => $val) {
-            $setClause[] = "{$key} = :{$key}";
+            $safeKey = self::safeIdentifier((string)$key);
+            $setClause[] = "{$safeKey} = :{$key}";
             $params[":{$key}"] = $val;
             $this->attributes[$key] = $val;
         }

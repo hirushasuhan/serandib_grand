@@ -1,0 +1,16 @@
+kind: wasmer.io/App.v0
+name: serandib-grand
+owner: hirushasuhan
+package: .
+
+env:
+  APP_ENV: "production"
+  APP_NAME: "Serendib Grand Hotel"
+  # Replace with your remote MySQL credentials (e.g. TiDB Serverless, Aiven, Railway, Wasmer):
+  DB_HOST: "your-database-host.com"
+  DB_PORT: "3306"
+  DB_NAME: "hotel_reservation_db"
+  DB_USER: "your_db_username"
+  DB_PASS: "your_db_password"
+  DB_SSL: "false"
+  BASE_URL: "https://serandib-grand.wasmer.app"

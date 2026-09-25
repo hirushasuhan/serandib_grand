@@ -42,27 +42,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
     } elseif ($action === 'bulk_create') {
-        $floor    = (int)$_POST['floor'];
-        $startNum = (int)$_POST['start_number'];
-        $endNum   = (int)$_POST['end_number'];
-        $typeId   = (int)$_POST['room_type_id'];
+        $floor    = (int)($_POST['floor'] ?? 0);
+        $startNum = (int)($_POST['start_number'] ?? 0);
+        $endNum   = (int)($_POST['end_number'] ?? 0);
+        $typeId   = (int)($_POST['room_type_id'] ?? 0);
 
-        $count = 0;
-        for ($num = $startNum; $num <= $endNum; $num++) {
-            $roomNo = (string)$num;
-            $exists = $db->query("SELECT COUNT(*) FROM rooms WHERE room_number = :n", [':n' => $roomNo])->fetchColumn();
-            if (!$exists) {
-                Room::create([
-                    'room_number'  => $roomNo,
-                    'room_type_id' => $typeId,
-                    'floor'        => $floor,
-                    'status'       => 'available',
-                    'is_active'    => 1
-                ]);
-                $count++;
+        if ($floor < 0 || $floor > 50 || $startNum < 1 || $endNum < 1 || $endNum < $startNum) {
+            Flash::error("Invalid room range or floor number provided.");
+        } elseif (($endNum - $startNum) > 50) {
+            Flash::error("Bulk generator limit exceeded: maximum 50 rooms can be created in a single batch.");
+        } else {
+            $count = 0;
+            for ($num = $startNum; $num <= $endNum; $num++) {
+                $roomNo = (string)$num;
+                $exists = $db->query("SELECT COUNT(*) FROM rooms WHERE room_number = :n", [':n' => $roomNo])->fetchColumn();
+                if (!$exists) {
+                    Room::create([
+                        'room_number'  => $roomNo,
+                        'room_type_id' => $typeId,
+                        'floor'        => $floor,
+                        'status'       => 'available',
+                        'is_active'    => 1
+                    ]);
+                    $count++;
+                }
             }
+            Flash::success("Bulk room generator created {$count} new rooms on Floor {$floor}.");
         }
-        Flash::success("Bulk room generator created {$count} new rooms on Floor {$floor}.");
 
     } elseif ($action === 'delete') {
         $id = (int)$_POST['room_id'];

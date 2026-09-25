@@ -66,7 +66,7 @@ require __DIR__ . '/../includes/nav.php';
 
           <div class="form-group">
             <label class="form-label">Email Address</label>
-            <input type="email" name="email" class="form-control <?= isset($errors['email']) ? 'form-control--error' : '' ?>" value="<?= e(old('email')) ?>" placeholder="yourname@domain.com" required autofocus>
+            <input type="email" name="email" class="form-control <?= isset($errors['email']) ? 'form-control--error' : '' ?>" value="<?= e(old('email')) ?>" placeholder="yourname@domain.com" autocomplete="username" required autofocus>
             <?php if (isset($errors['email'])): ?><div class="form-error"><?= e($errors['email']) ?></div><?php endif; ?>
           </div>
 
@@ -75,7 +75,7 @@ require __DIR__ . '/../includes/nav.php';
               <label class="form-label" style="margin-bottom: 0;">Password</label>
               <a href="<?= url('auth/forgot-password.php') ?>" style="font-size: var(--text-xs); color: var(--color-primary); font-weight: 600;">Forgot Password?</a>
             </div>
-            <input type="password" name="password" class="form-control <?= isset($errors['password']) ? 'form-control--error' : '' ?>" placeholder="••••••••" required>
+            <input type="password" name="password" class="form-control <?= isset($errors['password']) ? 'form-control--error' : '' ?>" placeholder="••••••••" autocomplete="current-password" required>
             <?php if (isset($errors['password'])): ?><div class="form-error"><?= e($errors['password']) ?></div><?php endif; ?>
           </div>
 

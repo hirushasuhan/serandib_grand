@@ -29,7 +29,7 @@
 #  the internal directories were actually protected. Directory protection is
 #  now done by a dedicated .htaccess inside each protected folder, which
 #  works no matter what the project folder is called.
-<FilesMatch "(^\.|composer\.(json|lock)|\.(sql|log|md|ini|sample|bak|old|dist|yml|yaml)$)">
+<FilesMatch "(^\.|composer\.(json|lock)|\.(sql|log|md|ini|sample|bak|old|dist|yml|yaml|toml|txt|env|sh|bat)$)">
     Require all denied
 </FilesMatch>
 
