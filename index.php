@@ -27,36 +27,41 @@ $metaDescription = 'Book oceanfront rooms and suites at ' . $hotelName
 /** Tells includes/header.php to load assets/css/public.css. */
 $isPublicPage = true;
 
-$featuredTypes = array_slice(RoomType::activeOnly(), 0, 3);
-
 $today    = date('Y-m-d');
 $tomorrow = date('Y-m-d', strtotime('+1 day'));
 
-/**
- * Availability for every featured card in ONE query.
- * Calling availableCount() inside the render loop was an N+1: one extra
- * round trip per card on every page load.
- */
+$featuredTypes = [];
 $availability = [];
-if ($featuredTypes) {
-    $availability = (new AvailabilityService())->availableCountsForTypes(
-        array_map(static fn($t) => (int) $t->id, $featuredTypes),
-        $today,
-        $tomorrow
-    );
-}
+$reviews = [];
+$totalRooms = 0;
+$totalTypes = 0;
+$avgRating = 4.9;
+$dbConnected = true;
 
-$reviews = Review::approvedReviews(3);
+try {
+    $featuredTypes = array_slice(RoomType::activeOnly(), 0, 3);
 
-/* ── Live figures for the counter strip ── */
-$totalRooms = count(Room::where(['is_active' => 1]));
-$totalTypes = count($featuredTypes) > 0 ? count(RoomType::activeOnly()) : 0;
+    if ($featuredTypes) {
+        $availability = (new AvailabilityService())->availableCountsForTypes(
+            array_map(static fn($t) => (int) $t->id, $featuredTypes),
+            $today,
+            $tomorrow
+        );
+    }
 
-$avgRating = 0.0;
-$allApproved = Review::approvedReviews(500);
-if ($allApproved) {
-    $ratings   = array_map(static fn($r) => (float) ($r['rating'] ?? 0), $allApproved);
-    $avgRating = round(array_sum($ratings) / max(1, count($ratings)), 1);
+    $reviews = Review::approvedReviews(3);
+    $totalRooms = count(Room::where(['is_active' => 1]));
+    $totalTypes = count($featuredTypes) > 0 ? count(RoomType::activeOnly()) : 0;
+
+    $allApproved = Review::approvedReviews(500);
+    if ($allApproved) {
+        $ratings   = array_map(static fn($r) => (float) ($r['rating'] ?? 0), $allApproved);
+        $avgRating = round(array_sum($ratings) / max(1, count($ratings)), 1);
+    }
+} catch (\Throwable $e) {
+    $dbConnected = false;
+    $dbError = $e->getMessage();
+    \App\Core\Logger::warning("Database unavailable on homepage: " . $e->getMessage());
 }
 
 /** Splits the headline so each word can be animated separately. */
@@ -67,6 +72,15 @@ require __DIR__ . '/includes/nav.php';
 ?>
 
 <main id="main">
+
+  <?php if (!$dbConnected): ?>
+    <div style="background: rgba(234, 179, 8, 0.15); border: 1px solid rgba(234, 179, 8, 0.4); color: #b45309; padding: 14px 20px; margin: 20px auto; max-width: 1200px; border-radius: 8px; font-size: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; backdrop-filter: blur(8px);">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 20px;">⚠️</span>
+        <span><strong>Database Notice:</strong> Unable to connect to MySQL database at <code><?= e(DB_HOST) ?>:<?= e((string) DB_PORT) ?></code> (<?= e($dbError ?? '') ?>).</span>
+      </div>
+    </div>
+  <?php endif; ?>
 
   <!-- ═══════════════════════════════════════════════════════════
        1. HERO — drone video background behind a glass search panel

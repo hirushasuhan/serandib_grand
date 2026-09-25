@@ -15,20 +15,22 @@ final class Database
 
     private function __construct(array $cfg)
     {
-        $dsn = "mysql:host={$cfg['host']};dbname={$cfg['name']};charset={$cfg['charset']}";
+        $port = !empty($cfg['port']) ? ";port={$cfg['port']}" : '';
+        $dsn  = "mysql:host={$cfg['host']}{$port};dbname={$cfg['name']};charset={$cfg['charset']}";
         try {
-            $this->pdo = new PDO($dsn, $cfg['user'], $cfg['pass'], [
+            $options = [
                 PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES   => false,
                 PDO::ATTR_STRINGIFY_FETCHES  => false,
-            ]);
+            ];
+            if (!empty($cfg['ssl'])) {
+                $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
+            }
+            $this->pdo = new PDO($dsn, $cfg['user'], $cfg['pass'], $options);
         } catch (Throwable $e) {
-            // Log the real reason, but do NOT put it in the thrown message —
-            // PDO connection errors quote the DSN, which exposes the host,
-            // database name and sometimes the username.
             Logger::error($e);
-            throw new RuntimeException('Database connection failure.');
+            throw new RuntimeException('Database connection failure: ' . $e->getMessage(), (int) $e->getCode(), $e);
         }
     }
 

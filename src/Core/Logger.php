@@ -19,6 +19,7 @@ final class Logger
         $contextStr = $context ? ' ' . json_encode($context) : '';
         $formatted = "[{$timestamp}] [{$level}] {$message}{$contextStr}" . PHP_EOL;
 
+        error_log(trim($formatted));
         @file_put_contents($logFile, $formatted, FILE_APPEND);
     }
 

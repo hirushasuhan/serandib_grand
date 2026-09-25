@@ -63,3 +63,10 @@ desktop.ini
 # ── Dependency dirs (we use no package manager, but just in case) ──
 /vendor/
 /node_modules/
+
+# ── Wasmer / Environment files ──
+*.webc
+.env
+.env.*
+!.env.example
+

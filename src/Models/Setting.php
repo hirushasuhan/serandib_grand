@@ -20,12 +20,16 @@ class Setting extends Model
             return self::$cache[$key];
         }
 
-        $sql = "SELECT setting_value FROM settings WHERE setting_key = :k LIMIT 1";
-        $val = Database::getInstance()->query($sql, [':k' => $key])->fetchColumn();
+        try {
+            $sql = "SELECT setting_value FROM settings WHERE setting_key = :k LIMIT 1";
+            $val = Database::getInstance()->query($sql, [':k' => $key])->fetchColumn();
 
-        if ($val !== false) {
-            self::$cache[$key] = $val;
-            return $val;
+            if ($val !== false) {
+                self::$cache[$key] = $val;
+                return $val;
+            }
+        } catch (\Throwable) {
+            return $default;
         }
 
         return $default;

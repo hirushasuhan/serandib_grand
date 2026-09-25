@@ -10,11 +10,10 @@ if (!$user) return;
 $role = $user->role;
 $currentScript = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
 
-/**
- * Helper to check if a navigation link matches the current page.
- */
-function isActiveSidebar(string $path, string $currentScript): bool {
-    return str_ends_with($currentScript, ltrim($path, '/'));
+if (!function_exists('isActiveSidebar')) {
+    function isActiveSidebar(string $path, string $currentScript): bool {
+        return str_ends_with($currentScript, ltrim($path, '/'));
+    }
 }
 ?>
 

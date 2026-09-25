@@ -8,12 +8,14 @@ use App\Core\Database;
 echo "Importing database schema and seed data...\n";
 
 try {
-    $pdo = new PDO("mysql:host=" . DB_HOST, DB_USER, DB_PASS, [
+    $port = defined('DB_PORT') && DB_PORT ? ';port=' . DB_PORT : '';
+    $pdo = new PDO("mysql:host=" . DB_HOST . $port, DB_USER, DB_PASS, [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
     ]);
 
-    $pdo->exec("CREATE DATABASE IF NOT EXISTS `hotel_reservation_db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-    $pdo->exec("USE `hotel_reservation_db`");
+    $dbName = defined('DB_NAME') ? DB_NAME : 'hotel_reservation_db';
+    $pdo->exec("CREATE DATABASE IF NOT EXISTS `{$dbName}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+    $pdo->exec("USE `{$dbName}`");
 
     $schemaSql = file_get_contents(__DIR__ . '/schema.sql');
     $pdo->exec($schemaSql);

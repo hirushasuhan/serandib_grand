@@ -24,11 +24,15 @@ class User extends Model
     public static function hashPassword(string $plain): string
     {
         if (defined('PASSWORD_ARGON2ID')) {
-            return password_hash($plain, PASSWORD_ARGON2ID, [
-                'memory_cost' => 65536,
-                'time_cost'   => 4,
-                'threads'     => 2,
-            ]);
+            try {
+                return password_hash($plain, PASSWORD_ARGON2ID, [
+                    'memory_cost' => 65536,
+                    'time_cost'   => 4,
+                    'threads'     => 1, // Single thread required for WASI / WebAssembly runtimes
+                ]);
+            } catch (\Throwable) {
+                // Fallback to bcrypt if Argon2 is unsupported in environment
+            }
         }
         return password_hash($plain, PASSWORD_BCRYPT, ['cost' => 10]);
     }
@@ -39,8 +43,12 @@ class User extends Model
             return false;
         }
 
-        if (defined('PASSWORD_ARGON2ID') && password_needs_rehash($this->password_hash, PASSWORD_ARGON2ID)) {
-            $this->update(['password_hash' => self::hashPassword($plain)]);
+        try {
+            if (defined('PASSWORD_ARGON2ID') && password_needs_rehash($this->password_hash, PASSWORD_ARGON2ID)) {
+                $this->update(['password_hash' => self::hashPassword($plain)]);
+            }
+        } catch (\Throwable) {
+            // Rehash is non-critical and should not block authentication
         }
         return true;
     }

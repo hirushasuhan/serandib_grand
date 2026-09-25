@@ -75,32 +75,42 @@ $orderBy = match ($sort) {
     default      => 'base_price ASC',
 };
 
-$db        = Database::getInstance();
-$whereSql  = implode(' AND ', $where);
+$totalCount = 0;
+$paginator  = new Paginator(0, 9, $page);
+$roomTypes  = [];
+$availability = [];
+$dbConnected = true;
 
-$totalCount = (int) $db->query("SELECT COUNT(*) FROM room_types WHERE {$whereSql}", $params)->fetchColumn();
-$paginator  = new Paginator($totalCount, 9, $page);
+try {
+    $db        = Database::getInstance();
+    $whereSql  = implode(' AND ', $where);
 
-// LIMIT/OFFSET are integers derived inside Paginator, never raw input.
-$sql = "SELECT * FROM room_types
-        WHERE {$whereSql}
-        ORDER BY {$orderBy}
-        LIMIT {$paginator->perPage} OFFSET {$paginator->offset}";
+    $totalCount = (int) $db->query("SELECT COUNT(*) FROM room_types WHERE {$whereSql}", $params)->fetchColumn();
+    $paginator  = new Paginator($totalCount, 9, $page);
 
-$roomTypes = array_map(
-    static fn(array $row) => new RoomType($row),
-    $db->query($sql, $params)->fetchAll()
-);
+    $sql = "SELECT * FROM room_types
+            WHERE {$whereSql}
+            ORDER BY {$orderBy}
+            LIMIT {$paginator->perPage} OFFSET {$paginator->offset}";
 
-/* Availability for the whole page in ONE query instead of one per card. */
-$availService = new AvailabilityService();
-$availability = $roomTypes
-    ? $availService->availableCountsForTypes(
-        array_map(static fn($t) => (int) $t->id, $roomTypes),
-        $checkIn,
-        $checkOut
-      )
-    : [];
+    $roomTypes = array_map(
+        static fn(array $row) => new RoomType($row),
+        $db->query($sql, $params)->fetchAll()
+    );
+
+    /* Availability for the whole page in ONE query instead of one per card. */
+    $availService = new AvailabilityService();
+    $availability = $roomTypes
+        ? $availService->availableCountsForTypes(
+            array_map(static fn($t) => (int) $t->id, $roomTypes),
+            $checkIn,
+            $checkOut
+          )
+        : [];
+} catch (\Throwable $e) {
+    $dbConnected = false;
+    \App\Core\Logger::warning("Database unavailable on rooms page: " . $e->getMessage());
+}
 
 /** Current filter state, reused when building every link on the page. */
 $filterState = [

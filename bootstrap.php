@@ -28,12 +28,15 @@ if (defined('APP_ENV') && APP_ENV === 'production') {
 
 // Uncaught Exception Handler
 set_exception_handler(function (Throwable $e): void {
+    $errStr = "[Uncaught Exception] " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine();
     \App\Core\Logger::error($e);
+    @file_put_contents('php://stderr', $errStr . PHP_EOL);
+    $GLOBALS['last_error'] = $errStr;
     http_response_code(500);
     if (file_exists(__DIR__ . '/500.php')) {
         require __DIR__ . '/500.php';
     } else {
-        echo '<h1>500 - Internal Server Error</h1><p>An unexpected error occurred. Please try again later.</p>';
+        echo '<h1>500 - Internal Server Error</h1><p>' . htmlspecialchars($errStr) . '</p>';
     }
     exit;
 });

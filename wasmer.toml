@@ -1,0 +1,21 @@
+[package]
+name = "hirushasuhan/serandib-grand"
+version = "0.1.6"
+description = "Serendib Grand Hotel Reservation System"
+license = "MIT"
+entrypoint = "run"
+
+[dependencies]
+"php/php" = "*"
+
+[fs]
+"/app" = "./"
+
+[[command]]
+name = "run"
+module = "php/php:php"
+runner = "https://webc.org/runner/wcgi"
+
+[command.annotations.wasi]
+atom = "php/php:php"
+main-args = ["-t", "/app", "-S", "0.0.0.0:80", "/app/router.php"]
