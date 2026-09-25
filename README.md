@@ -1,13 +1,28 @@
-# Hotel Reservation System
-# Hotel Reservation System — Project Specification
+# Hotel Reservation System — Serandib Grand
+**Module:** CST 226-2 Web Application Development  
+**Assignment:** Group Project (7 members)  
+**Selected Topic:** Hotel Reservation System  
+**Stack:** Pure PHP 8.x (no framework), MySQL 8 / MariaDB, HTML5, CSS3, Vanilla JavaScript (ES6)  
+**Deployment Platform:** WebAssembly (Wasm) on Wasmer Edge via WCGI  
+**Live Application URL:** [https://serandib-grand.wasmer.app](https://serandib-grand.wasmer.app)  
+**Local Development URL:** `http://localhost/serandib_grand/`  
 
-**Module:** CST 226-2 Web Application Development
-**Assignment:** Group Project (7 members)
-**Selected Topic:** Hotel Reservation System
-**Stack:** PHP 8.x (no framework), MySQL 8 / MariaDB, HTML5, CSS3, Vanilla JavaScript (ES6)
-**Environment:** XAMPP (Apache + MySQL + PHP)
-**Project root:** `C:\xampp\htdocs\serandib_grand`
-**Local URL:** `http://localhost/serandib_grand/`
+---
+
+### 🌐 Live Demo & Pre-Configured Test Accounts
+
+The live system is deployed on Wasmer Edge: **[https://serandib-grand.wasmer.app](https://serandib-grand.wasmer.app)**
+
+You can log in and test each role using these verified credentials:
+
+| # | User Role | Email | Password | Access Scope |
+|---|---|---|---|---|
+| **1** | **System Administrator** | `admin@hotel.test` | `Admin@1234` | Full system control: staff provisioning, rooms & room types CRUD, amenities, settings, security audit logs. |
+| **2** | **Operations Manager** | `manager@hotel.test` | `Manager@1234` | Management dashboard: KPI metrics, cancellation/refund approvals, review moderation, occupancy & revenue reports. |
+| **3** | **Front Desk / Receptionist** | `reception@hotel.test`<br>*(or `reception2@hotel.test`)* | `Reception@1234` | Front desk operations: walk-in bookings, room status board, guest check-in/check-out, extra charges, payments, and PDF invoicing. |
+| **4** | **Guest Account** | `guest@hotel.test` | `Guest@1234` | Public guest portal: room exploration, booking creation, profile management, reservation history, and post-stay reviews. |
+
+---
 
 > This document is the single source of truth for the whole group. **Read this fully before writing any code.**
 > Nobody writes a line of code until the folder structure, database schema, and CSS design tokens in this document exist in the repository.
@@ -2467,6 +2482,29 @@ define('APP_TIMEZONE', 'Asia/Colombo');
 define('CURRENCY',     'LKR');
 date_default_timezone_set(APP_TIMEZONE);
 ```
+
+### 15.4 Wasmer Edge Deployment (WebAssembly)
+
+The application is engineered to run seamlessly on **Wasmer Edge** via WebAssembly CGI (WCGI):
+
+- **Live Edge URL:** [https://serandib-grand.wasmer.app](https://serandib-grand.wasmer.app)
+- **Deployment Manifest:** `wasmer.toml` (configured with `php/php = "*"` and WCGI runner)
+- **Configuration:** Copy `app.sample.yaml` to `app.yaml` and configure your remote MySQL database credentials.
+- **Deploy Command:**
+  ```bash
+  wasmer deploy
+  ```
+
+### 15.5 Pre-Configured Test Accounts
+
+The database comes pre-seeded (`database/seed.sql`) with four distinct role accounts:
+
+| # | Role | Email | Password | Capabilities |
+|---|---|---|---|---|
+| **1** | **System Administrator** | `admin@hotel.test` | `Admin@1234` | Staff accounts, room inventory CRUD, amenities, settings, audit logs |
+| **2** | **Operations Manager** | `manager@hotel.test` | `Manager@1234` | KPI cards, cancellation approvals, review moderation, occupancy & revenue reports |
+| **3** | **Front Desk / Receptionist** | `reception@hotel.test`<br>*(or `reception2@hotel.test`)* | `Reception@1234` | Front desk board, walk-in reservations, check-in/out, folio payments, PDF invoices |
+| **4** | **Guest Account** | `guest@hotel.test` | `Guest@1234` | Browse rooms, online booking creation, manage reservations, post-checkout reviews |
 
 ---
 
